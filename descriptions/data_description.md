@@ -77,7 +77,9 @@ Beide Pipelines (`fake_job_notebooks/preprocessing/prep_fake_jobs.ipynb`, `prep_
 
 ## 2. Airbnb Listings (Paris)
 
-Quelle: **Inside Airbnb** (`listings.csv`, Version 4.3, August 2022). Property-, Host- und Review-Metadaten von Kurzzeit-Vermietungen für **Paris**. Inside-Airbnb liefert kein OD-Label — der Outlier-Status wird über die Bewertung konstruiert.
+Quelle: **Inside Airbnb** (`listings.csv`, Scrape **September 2025**, `last_scraped` 2025-09-12 bis 2025-09-15). Property-, Host- und Review-Metadaten von Kurzzeit-Vermietungen für **Paris**. Inside-Airbnb liefert kein OD-Label — der Outlier-Status wird über die Bewertung konstruiert.
+
+> ⚠️ **Datenstand:** Es handelt sich um einen aktuellen Scrape (Sep. 2025), nicht um die ältere v4.3 (Aug. 2022). Das Schema enthält neuere Spalten (`source`, `estimated_occupancy_l365d`, `estimated_revenue_l365d`, `availability_eoy`, `number_of_reviews_ly`).
 
 ### Kenngrößen
 
@@ -93,12 +95,27 @@ Quelle: **Inside Airbnb** (`listings.csv`, Version 4.3, August 2022). Property-,
 | Datei (roh) | `data/raw/airbnb_paris.csv` |
 | Datei (cleaned) | `data/preprocessed/cleaned_airbnb_paris.csv` |
 
+> Hinweis: `Features (40)` / `Spalten nach Cleaning 45` stammen aus der älteren Datenversion und müssen für den Sep-2025-Scrape neu bestimmt werden — siehe **Vollständig leere Spalten** unten.
+
+### Vollständig leere Spalten (Sep-2025-Scrape)
+
+In dieser Datenversion sind mehrere Spalten zu **100 % leer** und damit unbrauchbar — das betrifft direkt das Feature Engineering:
+
+| Spalte | Status | Konsequenz |
+|---|---|---|
+| `price` | komplett leer | **Kein** Preis-Feature möglich (Feature-Engineering-Schritt „price parsen" entfällt) |
+| `beds` | komplett leer | droppen; ggf. durch `accommodates` ersetzen |
+| `bathrooms` | komplett leer | aus `bathrooms_text` (`"1 bath"`, `"1.5 baths"`, `"shared bath"`) parsen |
+| `neighbourhood_group_cleansed` | komplett leer | droppen |
+| `calendar_updated` | komplett leer | droppen |
+| `estimated_revenue_l365d` | komplett leer | droppen |
+
 ### Spaltenübersicht
 
 | Typ | Spalten (Auswahl) |
 |---|---|
 | ID / Metadaten | `id`, `host_id`, `listing_url`, `scrape_id`, `last_scraped` *(im Cleaning entfernt)* |
-| Property | `property_type`, `room_type`, `accommodates`, `bedrooms`, `beds`, `bathrooms` |
+| Property | `property_type` (61 Werte, freq-enc), `room_type` (4 Werte, OHE), `accommodates`, `bedrooms` (81 % gefüllt); `beds`/`bathrooms` leer → `bathrooms` aus `bathrooms_text` |
 | Host | `host_since`, `host_response_rate`, `host_acceptance_rate`, `host_is_superhost`, `host_identity_verified`, `host_verifications`, `host_location` |
 | Geo | `latitude`, `longitude`, `neighbourhood_cleansed` (Arrondissements, freq-encoded) |
 | Booking / Pricing | `price`, `minimum_nights`, `maximum_nights`, `instant_bookable` |
@@ -109,7 +126,25 @@ Quelle: **Inside Airbnb** (`listings.csv`, Version 4.3, August 2022). Property-,
 
 ### Fehlende Werte (roh)
 
-Typische Missing-Spalten vor dem Cleaning: `host_about`, `neighborhood_overview`, `host_location`, `host_response_rate`, `host_acceptance_rate`, `host_response_time`. Behandlung im Cleaning: numerisch → Median, kategorisch → `"unknown"`, Boolean → Mode, Freitexte → bleiben als NaN bzw. leerer String und werden erst beim Embedding gefüllt.
+Behandlung im Cleaning: numerisch → Median, kategorisch → `"unknown"`, Boolean → Mode, Freitexte → bleiben als NaN bzw. leerer String und werden erst beim Embedding gefüllt.
+
+| Spalte | Missing | Anteil |
+|---|---|---|
+| `beds`, `bathrooms`, `price`, `calendar_updated`, `neighbourhood_group_cleansed`, `estimated_revenue_l365d` | 81.853 | 100,0 % |
+| `host_neighbourhood` | 53.832 | 65,8 % |
+| `host_about` | 45.350 | 55,4 % |
+| `neighbourhood`, `neighborhood_overview` | 42.253 | 51,6 % |
+| `host_response_time`, `host_response_rate` | ~32.200 | 39,3 % |
+| `host_acceptance_rate` | 26.107 | 31,9 % |
+| `review_scores_*` | ~18.000 | 22,0 % |
+| `review_scores_rating` (Label-Quelle) | 17.960 | 21,9 % |
+| `reviews_per_month` | 17.960 | 22,0 % |
+| `bedrooms` | 15.427 | 18,9 % |
+| `description` | 2.713 | 3,3 % |
+| `bathrooms_text` | 67 | < 0,1 % |
+| `name` | 0 | 0,0 % |
+
+**Freitextspalten:** `name` (0 %), `description` (3,3 %), `neighborhood_overview` (51,6 %), `host_about` (55,4 %).
 
 ### OD-Label — Konstruktion via Bewertung
 
@@ -126,19 +161,20 @@ Konstruktion in `airbnb_notebooks/preprocessing/data_cleaning.ipynb`:
 `airbnb_notebooks/preprocessing/data_cleaning.ipynb`:
 
 1. **`host_since`** → `host_tenure_days` (Tage seit Registrierung).
-2. **`host_response_rate`, `host_acceptance_rate`, `price`** → Sonderzeichen entfernen, in Float.
-3. **`amenities`, `host_verifications`** → Listenlängen als Counts.
-4. **`host_location`** → Flags `host_in_paris`, `host_in_france`, `host_location_missing`; Rohspalte gedroppt.
-5. **Boolean (`t`/`f`)** → 0/1.
-6. **OHE** für niedrige Kardinalität: `host_response_time` (5 Spalten), `room_type` (4 Spalten).
-7. **Frequency-Encoding** für hohe Kardinalität: `neighbourhood_cleansed`, `property_type`.
-8. **`StandardScaler`** auf alle numerischen / frequency-encoded Spalten (Boolean, OHE, Label, Freitexte ausgenommen).
-9. Spaltennamen in `snake_case` normalisiert (Umlaute transliteriert).
+2. **`host_response_rate`, `host_acceptance_rate`** → `%` entfernen, in Float (`price` entfällt, da leer).
+3. **`bathrooms`** → aus `bathrooms_text` parsen (Zahl extrahieren; `"shared/half bath"` → 0,5).
+5. **`amenities`, `host_verifications`** → Listenlängen als Counts.
+6. **`host_location`** → Flags `host_in_paris`, `host_in_france`, `host_location_missing`; Rohspalte gedroppt.
+7. **Boolean (`t`/`f`)** → 0/1.
+8. **OHE** für niedrige Kardinalität: `host_response_time` (5 Spalten inkl. `unknown`), `room_type` (4 Spalten).
+9. **Frequency-Encoding** für hohe Kardinalität: `neighbourhood_cleansed` (20 Arrondissements), `property_type` (61 Werte).
+10. **`StandardScaler`** auf alle numerischen / frequency-encoded Spalten (Boolean, OHE, Label, Freitexte ausgenommen).
+11. Spaltennamen in `snake_case` normalisiert (Umlaute transliteriert).
 
 ### Pipelines
 
 | Pipeline | Text-Behandlung | Ergebnis | Datei |
 |---|---|---|---|
-| **Cleaning / Baseline** | Freitexte bleiben als Rohspalten erhalten | 40 Features + 4 Text + Label = **45 Spalten** | `data/preprocessed/cleaned_airbnb_paris.csv` |
-| **Embedding-Pipeline** | Sentence-Transformer (`all-mpnet-base-v2`, 384 Dim/Spalte) | 40 Features + 4×384 emb + Label = **1.577 Spalten** | `data/preprocessed/embed_airbnb_paris.csv` |
+| **Cleaning / Baseline** | Freitexte bleiben als Rohspalten erhalten | Features + 4 Text + Label (Feature-Anzahl für Sep-2025-Scrape neu zu bestimmen, da `price`/`beds`/`bathrooms` leer) | `data/preprocessed/cleaned_airbnb_paris.csv` |
+| **Embedding-Pipeline** | Sentence-Transformer `all-mpnet-base-v2` (**768 Dim/Spalte**) | Features + 4×768 emb + Label | `data/preprocessed/embed_airbnb_paris.csv` |
 | **Embedding-Cache (mpnet)** | `all-mpnet-base-v2` (768 Dim/Spalte) als `.npz`-Cache | 4×768 = 3.072 Embedding-Dim | `data/preprocessed/embed_airbnb_paris_mpnet.npz` |

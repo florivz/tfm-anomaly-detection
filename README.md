@@ -51,8 +51,10 @@ Die zugehörigen Notebooks liegen unter
 - Kategorische Daten: One-Hot- oder Frequency-Encoding (je nach Bedarf).
 - Numerische Werte: skaliert.
 - Freitextspalten: entfernt.
-- Unnötige Zeilen entfernt.
+- Unnötige Spalten entfernt.
 - Airbnb Paris: ICC angewandt.
+- Datumsangaben splitten.
+- weitere Preprocessing und Feature Engineering Schritte individuell nach Datensatz.
 
 ### 2. Cleaned + Freitexte
 Erzeugt das Cleaned-Dataset zuzüglich der originalen Freitexte für das **AnoLLM**-Modell.
@@ -77,8 +79,8 @@ Wie Variante 5, anschließend PCA auf die TabPFN-Embeddings. Die erklärte Varia
 
 ## Experiment-Struktur
 
-- Aufbau im Repo: `root/<datensatz>/<experiment>/notebook.ipynb`
-- **MLflow** loggt alle Ergebnisse nach dem Schema `<datensatz> → Experiment_x`.
+- Aufbau im Repo: `root/<datensatz>/<exp>/notebook.ipynb`
+- **MLflow** loggt alle Ergebnisse nach dem Schema `<datensatz> → experiment_x`.
 - Speicherung im Ordner `mlruns` (keine Datenbank).
 - Geloggte Metriken: **AP** (Average Precision), **AUC-ROC** sowie die **Laufzeit** jedes Modells.
 
