@@ -16,7 +16,7 @@ Lies vor dem Start folgende Dateien:
 
 ## Code
 
-- So **kurz und einfach** wie möglich.
+- So **kurz und einfach** wie möglich. Auch die einzelnen Code Zellen sollen kurz und sinnvoll unterteilt werden in kleine Code Zellen.
 - Nur **wenige Kommentare**, auf Englisch.
 - Kein validierender, absichernder oder unnötiger Overhead-Code.
 
