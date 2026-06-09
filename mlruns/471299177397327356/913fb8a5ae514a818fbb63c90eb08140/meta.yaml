@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/airbnb_notebooks/exp2/../../mlruns/471299177397327356/913fb8a5ae514a818fbb63c90eb08140/artifacts
+end_time: 1780918928203
+entry_point_name: ''
+experiment_id: '471299177397327356'
+lifecycle_stage: active
+run_id: 913fb8a5ae514a818fbb63c90eb08140
+run_name: semantic_pca100__loda
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780918928189
+status: 3
+tags: []
+user_id: debian

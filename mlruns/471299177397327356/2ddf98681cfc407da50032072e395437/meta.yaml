@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/airbnb_notebooks/exp2/../../mlruns/471299177397327356/2ddf98681cfc407da50032072e395437/artifacts
+end_time: 1780918627962
+entry_point_name: ''
+experiment_id: '471299177397327356'
+lifecycle_stage: active
+run_id: 2ddf98681cfc407da50032072e395437
+run_name: enhanced__autoencoder
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780918627949
+status: 3
+tags: []
+user_id: debian

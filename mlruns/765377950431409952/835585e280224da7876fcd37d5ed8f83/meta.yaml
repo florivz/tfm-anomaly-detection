@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/fake_job_notebooks/exp2/../../mlruns/765377950431409952/835585e280224da7876fcd37d5ed8f83/artifacts
+end_time: 1780918908473
+entry_point_name: ''
+experiment_id: '765377950431409952'
+lifecycle_stage: active
+run_id: 835585e280224da7876fcd37d5ed8f83
+run_name: cleaned__autoencoder
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780918908457
+status: 3
+tags: []
+user_id: debian

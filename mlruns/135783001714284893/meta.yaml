@@ -1,0 +1,8 @@
+artifact_location: file:///home/debian/TFM_master_thesis/fake_job_notebooks/exp1/../../mlruns/135783001714284893
+creation_time: 1780130098860
+experiment_id: '135783001714284893'
+last_update_time: 1780130098860
+lifecycle_stage: active
+name: fake_jobs_experiment_1
+trace_location: null
+workspace: default
