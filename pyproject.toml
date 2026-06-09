@@ -6,6 +6,21 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "sap-rpt-oss",
+    "pandas",
+    "numpy",
+    "scikit-learn",
+    "sentence-transformers",
+    "tabpfn",
+    "ipykernel",
+    "python-dotenv",
+    "pyod",
+    "mlflow",
+    "tabpfn-extensions",
+    "peft",
+    "accelerate",
+    "shap",
+    "datasets",
+    "safetensors",
 ]
 
 [tool.uv.sources]

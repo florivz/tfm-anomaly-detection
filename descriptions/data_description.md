@@ -59,19 +59,20 @@ Natürlich vorhanden: `fraudulent ∈ {0, 1}`. Keine Konstruktion nötig.
 
 ### Feature Engineering
 
-Beide Pipelines (`fake_job_notebooks/preprocessing/prep_fake_jobs.ipynb`, `prep_embed_fake_jobs.ipynb`) wenden dieselben Ableitungen an:
+Die Cleaned-Pipeline (`fake_job_notebooks/preprocessing/cleaned.ipynb`) leitet ab:
 
 1. **`location` aufsplitten** → `country`, `state`, `city`.
-2. **`salary_range` parsen** → `salary_avg` (Mittel der Range) + `salary_missing` (Binär-Indikator).
-3. **`job_id` droppen** (reine ID).
-4. **`fraudulent`** wird als Label extrahiert.
+2. **`salary_range` parsen** → `salary_avg` (Mittel der Range, Median-imputiert).
+3. **`job_id`** als `row_id` (Join-Key) behalten; Label `fraudulent` extrahiert.
+4. Alle Kategorien **frequency-encoded**, numerische Spalten StandardScaler-skaliert.
 
 ### Pipelines
 
-| Pipeline | Text-Behandlung | Ergebnis | Datei |
+| Pipeline | Notebook | Ergebnis | Datei |
 |---|---|---|---|
-| **Manuelle Baseline** | Freitexte droppen | 13 Features | `data/preprocessed/baseline_fake_jobs.csv` |
-| **Embedding-Pipeline** | Sentence-Transformer (`all-MiniLM-L6-v2`, 384 Dim/Spalte) | 1.959 Features (5 num + 6 freq + 28 OHE + 1.920 emb) | `data/preprocessed/embed_fake_jobs.csv` |
+| **Cleaned** | `preprocessing/cleaned.ipynb` | 13 numerische Features (Text entfernt) + `row_id` | `cleaned_fake_jobs.csv` |
+| **Cleaned + Freitexte** | `preprocessing/cleaned_text.ipynb` | Cleaned + 5 Rohtexte | `cleaned_text_fake_jobs.csv` |
+| **Semantisch / Enhanced** | `preprocessing/{semantic,enhanced}*.ipynb` | Sentence-Transformer- bzw. TabPFN-Embeddings | `{semantic,enhanced}*_fake_jobs.csv` |
 
 ---
 
@@ -148,7 +149,7 @@ Behandlung im Cleaning: numerisch → Median, kategorisch → `"unknown"`, Boole
 
 ### OD-Label — Konstruktion via Bewertung
 
-Konstruktion in `airbnb_notebooks/preprocessing/data_cleaning.ipynb`:
+Konstruktion in `airbnb_notebooks/preprocessing/cleaned.ipynb`:
 
 1. **Inlier (`is_top_rating = 1`):** `review_scores_rating == 5.0` (Top-Bewertung).
 2. **Outlier (`is_top_rating = 0`):** `review_scores_rating <= 3.0` (klar schwache Bewertung).
@@ -158,7 +159,7 @@ Konstruktion in `airbnb_notebooks/preprocessing/data_cleaning.ipynb`:
 
 ### Feature Engineering
 
-`airbnb_notebooks/preprocessing/data_cleaning.ipynb`:
+`airbnb_notebooks/preprocessing/cleaned.ipynb`:
 
 1. **`host_since`** → `host_tenure_days` (Tage seit Registrierung).
 2. **`host_response_rate`, `host_acceptance_rate`** → `%` entfernen, in Float (`price` entfällt, da leer).
@@ -173,8 +174,8 @@ Konstruktion in `airbnb_notebooks/preprocessing/data_cleaning.ipynb`:
 
 ### Pipelines
 
-| Pipeline | Text-Behandlung | Ergebnis | Datei |
+| Pipeline | Notebook | Ergebnis | Datei |
 |---|---|---|---|
-| **Cleaning / Baseline** | Freitexte bleiben als Rohspalten erhalten | Features + 4 Text + Label (Feature-Anzahl für Sep-2025-Scrape neu zu bestimmen, da `price`/`beds`/`bathrooms` leer) | `data/preprocessed/cleaned_airbnb_paris.csv` |
-| **Embedding-Pipeline** | Sentence-Transformer `all-mpnet-base-v2` (**768 Dim/Spalte**) | Features + 4×768 emb + Label | `data/preprocessed/embed_airbnb_paris.csv` |
-| **Embedding-Cache (mpnet)** | `all-mpnet-base-v2` (768 Dim/Spalte) als `.npz`-Cache | 4×768 = 3.072 Embedding-Dim | `data/preprocessed/embed_airbnb_paris_mpnet.npz` |
+| **Cleaned** | `preprocessing/cleaned.ipynb` | numerische Features (Text entfernt) + `row_id` | `cleaned_airbnb_paris.csv` |
+| **Cleaned + Freitexte** | `preprocessing/cleaned_text.ipynb` | Cleaned + 4 Rohtexte | `cleaned_text_airbnb_paris.csv` |
+| **Semantisch / Enhanced** | `preprocessing/{semantic,enhanced}*.ipynb` | Sentence-Transformer- bzw. TabPFN-Embeddings | `{semantic,enhanced}*_airbnb_paris.csv` |
