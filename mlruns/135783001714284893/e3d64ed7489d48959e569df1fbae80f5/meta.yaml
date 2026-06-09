@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/fake_job_notebooks/exp1/../../mlruns/135783001714284893/e3d64ed7489d48959e569df1fbae80f5/artifacts
+end_time: 1780313149335
+entry_point_name: ''
+experiment_id: '135783001714284893'
+lifecycle_stage: active
+run_id: e3d64ed7489d48959e569df1fbae80f5
+run_name: anollm
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780313149323
+status: 3
+tags: []
+user_id: debian

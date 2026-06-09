@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/airbnb_notebooks/exp4/../../mlruns/717397021756983908/0d3779dd375f4ed0826ddad0fdfd02d0/artifacts
+end_time: 1780911730830
+entry_point_name: ''
+experiment_id: '717397021756983908'
+lifecycle_stage: active
+run_id: 0d3779dd375f4ed0826ddad0fdfd02d0
+run_name: tabpfn_classification
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780911730817
+status: 3
+tags: []
+user_id: debian

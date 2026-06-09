@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/airbnb_notebooks/exp2/../../mlruns/471299177397327356/58a825ccc57a4f2081ff8e934675a6af/artifacts
+end_time: 1780334068580
+entry_point_name: ''
+experiment_id: '471299177397327356'
+lifecycle_stage: active
+run_id: 58a825ccc57a4f2081ff8e934675a6af
+run_name: cleaned__loda
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780334068560
+status: 3
+tags: []
+user_id: debian

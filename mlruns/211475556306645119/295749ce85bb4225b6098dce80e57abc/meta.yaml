@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/mlruns/211475556306645119/295749ce85bb4225b6098dce80e57abc/artifacts
+end_time: 1780480024152
+entry_point_name: ''
+experiment_id: '211475556306645119'
+lifecycle_stage: active
+run_id: 295749ce85bb4225b6098dce80e57abc
+run_name: part1_raw_text
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780480024128
+status: 3
+tags: []
+user_id: debian
