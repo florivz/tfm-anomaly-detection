@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/airbnb_notebooks/exp2/../../mlruns/471299177397327356/dfa8f862e3784f35a9e58953fa5d92d9/artifacts
+end_time: 1780369386737
+entry_point_name: ''
+experiment_id: '471299177397327356'
+lifecycle_stage: active
+run_id: dfa8f862e3784f35a9e58953fa5d92d9
+run_name: semantic_pca30__autoencoder
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780369386709
+status: 3
+tags: []
+user_id: debian

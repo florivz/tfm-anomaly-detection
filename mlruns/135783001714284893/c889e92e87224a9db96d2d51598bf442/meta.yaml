@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/fake_job_notebooks/exp1/../../mlruns/135783001714284893/c889e92e87224a9db96d2d51598bf442/artifacts
+end_time: 1780329345475
+entry_point_name: ''
+experiment_id: '135783001714284893'
+lifecycle_stage: active
+run_id: c889e92e87224a9db96d2d51598bf442
+run_name: tabpfn_unsup
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780329345462
+status: 3
+tags: []
+user_id: debian

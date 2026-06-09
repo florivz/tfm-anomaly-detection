@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/fake_job_notebooks/exp1/../../mlruns/135783001714284893/87fecbff8ce947ad93c3aa2047ed729a/artifacts
+end_time: 1780130315816
+entry_point_name: ''
+experiment_id: '135783001714284893'
+lifecycle_stage: active
+run_id: 87fecbff8ce947ad93c3aa2047ed729a
+run_name: loda
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780130315791
+status: 3
+tags: []
+user_id: debian

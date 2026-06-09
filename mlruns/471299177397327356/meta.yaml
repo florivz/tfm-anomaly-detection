@@ -1,0 +1,8 @@
+artifact_location: file:///home/debian/TFM_master_thesis/airbnb_notebooks/exp2/../../mlruns/471299177397327356
+creation_time: 1780334063406
+experiment_id: '471299177397327356'
+last_update_time: 1780334063406
+lifecycle_stage: active
+name: airbnb_paris_experiment_2
+trace_location: null
+workspace: default

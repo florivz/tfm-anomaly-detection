@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/fake_job_notebooks/exp2/../../mlruns/765377950431409952/9e6b88eccaba40beb4794a991307861d/artifacts
+end_time: 1780918279080
+entry_point_name: ''
+experiment_id: '765377950431409952'
+lifecycle_stage: active
+run_id: 9e6b88eccaba40beb4794a991307861d
+run_name: cleaned__iforest
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780918279058
+status: 3
+tags: []
+user_id: debian

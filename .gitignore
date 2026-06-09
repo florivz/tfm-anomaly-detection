@@ -47,4 +47,5 @@ Thumbs.db
 FoMo-0D/
 anollm_src/
 .env
-.env
+/.claude/scheduled_tasks.lock
+/run_until_3_runs.py
