@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/airbnb_notebooks/exp2/../../mlruns/471299177397327356/603741409f1b422bb05cf2425209b5f3/artifacts
+end_time: 1780345196827
+entry_point_name: ''
+experiment_id: '471299177397327356'
+lifecycle_stage: active
+run_id: 603741409f1b422bb05cf2425209b5f3
+run_name: semantic__iforest
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780345196814
+status: 3
+tags: []
+user_id: debian

@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/fake_job_notebooks/exp2/../../mlruns/765377950431409952/27a45fc867bb43118575df2e31e1265c/artifacts
+end_time: 1780918390952
+entry_point_name: ''
+experiment_id: '765377950431409952'
+lifecycle_stage: active
+run_id: 27a45fc867bb43118575df2e31e1265c
+run_name: enhanced_semantic_pca30__loda
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780918390937
+status: 3
+tags: []
+user_id: debian
