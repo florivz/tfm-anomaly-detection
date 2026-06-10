@@ -48,3 +48,6 @@ FoMo-0D/
 anollm_src/
 .env
 *.lock
+mlruns/*
+
+/run_all_experiments.py
