@@ -46,7 +46,11 @@ Thumbs.db
 
 FoMo-0D/
 anollm_src/
+ShapPFN/
+ExplainerPFN/
+venv_explainerpfn/
 *.lock
 mlruns/*
 
+.env
 /run_all_experiments.py
