@@ -122,6 +122,28 @@ Welches Modell ist besser für die binäre Klassifikation als Outlier Detection:
 - TabPFN: `cleaned` (numerisch skaliert, Kategorien frequency-encoded, Freitexte entfernt)
 - ConTextTab: `cleaned_text` (dieselben numerischen Features + originale Freitexte, nativ verarbeitet)
 
+### Experiment 5 – TFM Erklärbarkeit
+
+Vergleich zweier moderner TFM-Explainer gegen KernelSHAP als Baseline auf einem TabPFN-Klassifikator
+(`cleaned`-Features, numerisch). Setup analog Exp. 3: seed 42, 1:4 Outlier/Inlier-Ratio,
+30 Erklär-Zeilen. Verglichen werden `mean|attr|` je Feature, Fidelity vs. KernelSHAP
+(Spearman + Cosine) und Laufzeit.
+
+- **KernelSHAP** – modell-agnostische Baseline (Gold-Standard)
+- **ShapPFN** – SHAP-Werte als Nebenprodukt des Forward Pass (`kunumi/ShapPFN`)
+- **ExplainerPFN** – Zero-Shot Explainer; benötigt TabPFN 2.1.2 → separate `venv_explainerpfn`
+  (Haupt-Env nutzt TabPFN 2.5)
+
+**Limitationen:** Alle Methoden werden einheitlich auf m ≤ 8 Features und n ≤ 200 Zeilen
+evaluiert (gemeinsame Obergrenze beider PFN-Explainer). Stratifiziertes 1:4-Sampling sichert
+stabile Attributionen trotz kleiner Stichprobe. ExplainerPFN erfordert zusätzlich einen
+Standard Scaler auf den `cleaned`-Features. Experiment 5 beschränkt sich auf die `cleaned`-Pipeline (numerische Features).
+Semantische und Freitext-Pipelines werden nicht evaluiert
+
+**Notebooks:** `explainers.ipynb` (KernelSHAP + ShapPFN, Haupt-`.venv`, erzeugt
+`ref_kernelshap.csv`) → danach `explainerpfn.ipynb` (`venv_explainerpfn`). Beide Repos
+als Clone im Projektverzeichnis (`ShapPFN/`, `ExplainerPFN/`, gitignored).
+
 ### 📊 Resultate (`experiment_summary.ipynb`)
 
 * **Pro Experiment & Datensatz:** Tabelle mit **AP**, **AUROC** und `n_runs` (Exp 1/2/4); Bar-Charts für Exp 1/2/4.
