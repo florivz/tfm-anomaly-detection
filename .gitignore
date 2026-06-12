@@ -46,7 +46,6 @@ Thumbs.db
 
 FoMo-0D/
 anollm_src/
-.env
 *.lock
 mlruns/*
 
