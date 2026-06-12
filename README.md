@@ -11,8 +11,8 @@ Evaluierung von **Tabular Foundation Models (TFMs)** für die Outlier Detection.
   `ssh debian@185.113.124.164` und die Daten von der lokalen Umgebung werden automatisch hochgeladen. 
 - Dort läuft eine vGPU **NVIDIA A40-12C**.
 - **Paketmanager:** `uv` muss installiert sein.
-- **API-Key:** `TABPFN_API_KEY=dein_key` in der `.env` eintragen.
 - **Aktivierung:** `uv sync` im Terminal ausführen.
+- **Foundation Modelle:** Die tabellarischen Foundation Modelle entsprechend deren Paper als submodul hinzufügen.
 
 ---
 
