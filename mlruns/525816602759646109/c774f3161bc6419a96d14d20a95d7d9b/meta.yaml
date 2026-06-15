@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/airbnb_notebooks/exp1/../../mlruns/525816602759646109/c774f3161bc6419a96d14d20a95d7d9b/artifacts
+end_time: 1781087497966
+entry_point_name: ''
+experiment_id: '525816602759646109'
+lifecycle_stage: active
+run_id: c774f3161bc6419a96d14d20a95d7d9b
+run_name: ecod
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1781087497957
+status: 3
+tags: []
+user_id: debian

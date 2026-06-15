@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/fake_job_notebooks/exp5/../../mlruns/291449465561997508/9fe1f5ed81e9489aa2b32ba8fa6632cc/artifacts
+end_time: 1781254662248
+entry_point_name: ''
+experiment_id: '291449465561997508'
+lifecycle_stage: active
+run_id: 9fe1f5ed81e9489aa2b32ba8fa6632cc
+run_name: shappfn
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1781254662217
+status: 3
+tags: []
+user_id: debian

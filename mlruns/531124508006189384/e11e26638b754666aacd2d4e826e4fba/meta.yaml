@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/fake_job_notebooks/exp4/../../mlruns/531124508006189384/e11e26638b754666aacd2d4e826e4fba/artifacts
+end_time: 1781173423827
+entry_point_name: ''
+experiment_id: '531124508006189384'
+lifecycle_stage: active
+run_id: e11e26638b754666aacd2d4e826e4fba
+run_name: contexttab
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1781173423813
+status: 3
+tags: []
+user_id: debian

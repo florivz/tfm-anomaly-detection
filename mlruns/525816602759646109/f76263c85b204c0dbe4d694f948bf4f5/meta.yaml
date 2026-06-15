@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/airbnb_notebooks/exp1/../../mlruns/525816602759646109/f76263c85b204c0dbe4d694f948bf4f5/artifacts
+end_time: 1781088793156
+entry_point_name: ''
+experiment_id: '525816602759646109'
+lifecycle_stage: active
+run_id: f76263c85b204c0dbe4d694f948bf4f5
+run_name: fomo_od
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1781088793146
+status: 3
+tags: []
+user_id: debian

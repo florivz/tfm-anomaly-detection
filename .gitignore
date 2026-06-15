@@ -29,8 +29,8 @@ env/
 htmlcov/
 
 # Data & model artifacts
-data/raw/
-data/preprocessed/
+data/preprocessed/*
+data/raw/*
 *.zip
 *.ckpt
 *.pt
@@ -49,8 +49,7 @@ anollm_src/
 ShapPFN/
 ExplainerPFN/
 venv_explainerpfn/
+CLAUDE.md
 *.lock
-mlruns/*
 
 .env
-/run_all_experiments.py

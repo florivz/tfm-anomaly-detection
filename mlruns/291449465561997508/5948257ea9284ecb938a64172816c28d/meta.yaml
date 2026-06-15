@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/fake_job_notebooks/exp5/../../mlruns/291449465561997508/5948257ea9284ecb938a64172816c28d/artifacts
+end_time: 1781265139050
+entry_point_name: ''
+experiment_id: '291449465561997508'
+lifecycle_stage: active
+run_id: 5948257ea9284ecb938a64172816c28d
+run_name: explainerpfn
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1781265139025
+status: 3
+tags: []
+user_id: debian

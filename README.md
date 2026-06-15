@@ -13,6 +13,7 @@ Evaluierung von **Tabular Foundation Models (TFMs)** für die Outlier Detection.
 - **Paketmanager:** `uv` muss installiert sein.
 - **Aktivierung:** `uv sync` im Terminal ausführen.
 - **Foundation Modelle:** Die tabellarischen Foundation Modelle entsprechend deren Paper als submodul hinzufügen.
+- **Daten Generierung:** Data Preprocessing Pipelines laufen lassen zur Generierung der preprocessed Daten.
 
 ---
 

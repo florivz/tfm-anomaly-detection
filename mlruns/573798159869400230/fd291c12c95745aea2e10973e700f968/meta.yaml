@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/fake_job_notebooks/exp2/../../mlruns/573798159869400230/fd291c12c95745aea2e10973e700f968/artifacts
+end_time: 1781087264868
+entry_point_name: ''
+experiment_id: '573798159869400230'
+lifecycle_stage: active
+run_id: fd291c12c95745aea2e10973e700f968
+run_name: semantic_pca100__autoencoder
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1781087264856
+status: 3
+tags: []
+user_id: debian

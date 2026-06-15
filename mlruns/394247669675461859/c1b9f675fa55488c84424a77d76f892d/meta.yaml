@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/airbnb_notebooks/exp2/../../mlruns/394247669675461859/c1b9f675fa55488c84424a77d76f892d/artifacts
+end_time: 1781091145060
+entry_point_name: ''
+experiment_id: '394247669675461859'
+lifecycle_stage: active
+run_id: c1b9f675fa55488c84424a77d76f892d
+run_name: enhanced_semantic_pca30__ecod
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1781091145048
+status: 3
+tags: []
+user_id: debian

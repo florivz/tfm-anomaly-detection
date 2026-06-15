@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/airbnb_notebooks/exp5/../../mlruns/249575385165837092/538da47411194cdc85c872f2683c5358/artifacts
+end_time: 1781256591632
+entry_point_name: ''
+experiment_id: '249575385165837092'
+lifecycle_stage: active
+run_id: 538da47411194cdc85c872f2683c5358
+run_name: explainerpfn
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1781256591553
+status: 3
+tags: []
+user_id: debian
