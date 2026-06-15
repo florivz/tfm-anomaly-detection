@@ -6,14 +6,22 @@ Evaluierung von **Tabular Foundation Models (TFMs)** für die Outlier Detection.
 
 ## Setup
 
-- **uv** ist das Standard-Tool zum Installieren von Abhängigkeiten.
-- Das Projekt liegt lokal in PyCharm und ist per SSH mit einer VM verbunden:
-  `ssh debian@185.113.124.164` und die Daten von der lokalen Umgebung werden automatisch hochgeladen. 
-- Dort läuft eine vGPU **NVIDIA A40-12C**.
-- **Paketmanager:** `uv` muss installiert sein.
-- **Aktivierung:** `uv sync` im Terminal ausführen.
-- **Foundation Modelle:** Die tabellarischen Foundation Modelle entsprechend deren Paper als submodul hinzufügen.
-- **Daten Generierung:** Data Preprocessing Pipelines laufen lassen zur Generierung der preprocessed Daten.
+### Umgebung
+- **Paketmanager:** [`uv`](https://docs.astral.sh/uv/) — muss installiert sein.
+- **Ausführung:** lokal in PyCharm, per SSH an eine VM gekoppelt (`ssh debian@185.113.124.164`); lokale Änderungen werden auf die VM hochgeladen.
+- **GPU:** vGPU **NVIDIA A40-12C** auf der VM (für TabPFN, ConTextTab, AnoLLM nötig).
+
+### Schnellstart (vorhandene Ergebnisse ansehen)
+1. `uv sync` — Abhängigkeiten installieren.
+2. `experiment_summary.ipynb` ausführen — aggregiert die bestehenden MLflow-Runs aus `./mlruns` zu Tabellen/Charts.
+
+### Eigene Experimente reproduzieren
+1. **Roh-Daten** laden: <https://th-koeln.sciebo.de/s/QDa6WLKEPFMrM5g/download> → nach `data/raw/`.
+2. **Preprocessing-Pipelines** ausführen (`<datensatz>_notebooks/preprocessing/`) → erzeugt die CSVs in `data/preprocessed/`.
+3. **Foundation-Modelle** je nach Experiment als Submodul/Clone hinzufügen (entsprechend dem jeweiligen Paper; für Exp 5 siehe dort die separate `venv_explainerpfn`).
+4. **Experiment-Notebooks** ausführen (`<datensatz>_notebooks/<exp>/`) → loggt nach `./mlruns`.
+5. `mlruns` ggf. mit der VM synchronisieren.
+6. `experiment_summary.ipynb` für die Gesamtauswertung ausführen.
 
 ---
 
