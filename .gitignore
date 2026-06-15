@@ -29,8 +29,8 @@ env/
 htmlcov/
 
 # Data & model artifacts
-data/preprocessed/*
-data/raw/*
+data/preprocessed/*.csv
+data/raw/*.csv
 *.zip
 *.ckpt
 *.pt
