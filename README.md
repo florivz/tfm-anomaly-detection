@@ -50,46 +50,53 @@ Die Label-Logik ist über alle Preprocessing-Varianten hinweg identisch.
 
 Kein Modell wird auf reinen Outliern trainiert.
 
+Weitere Informationen siehe: **descriptions &rArr; data_descriptions.md**
+
 ---
+
+## TFM Modellanforderungen
+
+siehe: **descriptions &rArr; tfm_model_requirements.md**
 
 ## Preprocessing-Pipelines
 
-Beide Datensätze werden in **7 Varianten** aufbereitet und unter
+Beide Datensätze werden in **8 Varianten** aufbereitet und unter
 `data/preprocessed/<sinnvoller_name_englisch>.csv` gespeichert.
 Die zugehörigen Notebooks liegen unter
 `<datensatz>_notebooks/preprocessing/<sinnvoller_name_englisch>.ipynb`.
 
 - **Kein Train/Test-Split im Preprocessing:** Jede Variante wird als **eine einzige CSV** gespeichert (nicht in `_train`/`_test` unterteilt). Der stratifizierte 70/30-Split erfolgt erst in den Experiment-Notebooks.
 
-### 1. Cleaned
-- Kategorische Daten: **Frequency-Encoding** (Häufigkeit je Kategorie).
-- Numerische Werte: Median-imputiert und StandardScaler-skaliert.
-- Freitext- sowie Leakage-/Müll-Spalten entfernt; `row_id` als Join-Key behalten.
-- Datensatz-spezifisches Feature Engineering (z. B. `salary_avg`; Airbnb: ICC, `host_tenure_days`, Listen-Counts, Host-Flags).
+### 1. cleaned
+Roh → Freitext-/Leakage-Spalten entfernen → kategorisch **frequency-encoden**, numerisch median-imputieren + **StandardScaler** → Feature Engineering (z. B. `salary_avg`; Airbnb: ICC, `host_tenure_days`, Listen-Counts, Host-Flags).
+→ rein numerische Tabelle.
 
-### 2. Cleaned + Freitexte
-Cleaned-Dataset plus die originalen Freitextspalten (per `row_id` angehängt) — für **AnoLLM** und **ConTextTab**.
+### 2. cleaned_text
+`cleaned` **+** die originalen Freitextspalten (per `row_id` angehängt).
+→ numerisch/encoded + Roh-Freitexte (für **AnoLLM** / **ConTextTab**).
 
-### 3. Semantisch (no PCA)
-Standard-Text-Embedding: `all-mpnet-base-v2`.
-Nutzt das *Cleaned + Freitexte*-Dataset, wobei die Freitexte hier durch das Embedding-Modell eingebettet werden:
+### 3. semantic
+`cleaned_text` → jede **Freitextzelle** per Sentence-Transformer (`all-mpnet-base-v2`) einbetten (+ Spaltennamen-Embedding addiert); Freitextspalten ersetzt durch ihre Embedding-Vektoren.
+→ numerisch/encoded + Text-Embeddings (hochdimensional).
 
-- **Freitext-Features:** Jede Textzelle wird per Sentence-Transformer in einen semantischen Vektor eingebettet.
-- **Spaltennamen:** Mit demselben Modell eingebettet (einmal pro Spalte gecacht, da konstant über alle Zeilen) und auf den Zellvektor **addiert** (eine Art Positionskodierung).
-- **Reihenfolge:** Zelle und Spaltenname werden getrennt embedded und erst danach elementweise addiert: `v_zelle + v_spalte`.
-- **Abschluss:** LayerNorm bzw. Standardisierung über die resultierenden Vektoren. Die Dimensionsanpassung erfolgt in den PCA-Stufen (Varianten 4/5), daher keine separaten lernbaren Projektionsschichten.
+### 4. semantic_pca100
+`semantic` → **PCA 100** über die Text-Embeddings.
+→ numerisch/encoded + 100 Text-PCA-Komponenten.
 
-### 4. Semantisch (PCA 100)
-Wie Variante 3, anschließend PCA auf 100 Komponenten aus den Sentence-Transformer-Embeddings.
+### 5. semantic_pca30
+`semantic` → **PCA 30** über die Text-Embeddings (erklärte Varianz > 80 %).
+→ numerisch/encoded + 30 Text-PCA-Komponenten.
 
-### 5. Semantisch (PCA 30)
-Wie Variante 3, anschließend PCA auf 30 Komponenten. Die erklärte Varianz muss größer als 80 % sein.
+### 6. enhanced
+`cleaned` (Text entfernt) → **TabPFN** auf das Label fitten → `get_embeddings` (~192-dim).
+→ nur TabPFN-Embeddings (keine Roh-Features).
 
-### 6. Enhanced (no PCA)
-TabPFN wird auf den **cleaned**-Daten für eine binäre Klassifikation des Labels trainiert (Texte vorher entfernt, da TabPFN nativ keinen Text verarbeitet). Die extrahierten Embeddings werden den Baseline-Modellen übergeben.
+### 7. enhanced_pca30
+`enhanced` → **PCA 30** über die TabPFN-Embeddings (erklärte Varianz > 80 %).
+→ nur 30 TabPFN-Embedding-PCA-Komponenten.
 
-### 7. Enhanced (PCA 30)
-Wie Variante 6, anschließend PCA auf die TabPFN-Embeddings. Die erklärte Varianz muss größer als 80 % sein.
+### 8. enhanced_semantic_pca30
+Join aus `enhanced_pca30` + `semantic_pca30`. Hat kein eigenes Notebook und wird erst in **Experiment 2** gebaut. Details zu allen Pipelines: `descriptions/pipeline_descriptions.md`.
 
 ---
 
