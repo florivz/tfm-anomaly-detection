@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/fake_job_notebooks/exp1/../../mlruns/416589972248588080/5e639ecf35fc458da19bffd127e067a4/artifacts
+end_time: 1781086500050
+entry_point_name: ''
+experiment_id: '416589972248588080'
+lifecycle_stage: active
+run_id: 5e639ecf35fc458da19bffd127e067a4
+run_name: fomo_od
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1781086500040
+status: 3
+tags: []
+user_id: debian

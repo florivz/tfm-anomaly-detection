@@ -1,0 +1,14 @@
+artifact_uri: file:///home/debian/TFM_master_thesis/airbnb_notebooks/exp5/../../mlruns/249575385165837092/447028a9261e4aabb4ed1ee50b1e7c5a/artifacts
+end_time: 1781256572608
+entry_point_name: ''
+experiment_id: '249575385165837092'
+lifecycle_stage: active
+run_id: 447028a9261e4aabb4ed1ee50b1e7c5a
+run_name: shappfn
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1781256572547
+status: 3
+tags: []
+user_id: debian
