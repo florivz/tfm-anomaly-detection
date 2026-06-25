@@ -1,0 +1,4 @@
+model,pearson_vs_KernelSHAP,spearman_vs_KernelSHAP,cosine_vs_KernelSHAP,runtime_s,runs_total
+kernelshap,,,,33.21,3
+shappfn,0.8771,0.7198,0.9006,0.01,3
+explainerpfn,-0.0251,-0.0071,0.5428,0.46,5

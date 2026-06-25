@@ -1,0 +1,3 @@
+model,AP,AUROC,runtime_s,n_runs
+contexttab,0.915,0.9649,2.46,3
+tabpfn_classification,0.8412,0.9453,2.1067,3
