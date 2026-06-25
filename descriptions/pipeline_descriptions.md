@@ -1,11 +1,42 @@
 # Pipeline-Beschreibungen
 
 Kurzüberblick, was jede Preprocessing-Variante grob Schritt für Schritt macht.
-Quelle sind die Rohdaten (`data/raw`), Output je Variante eine CSV unter `data/preprocessed/`.
+Quelle sind die Rohdaten unter `data/raw/` (`airbnb_paris.csv`, `fake_job_postings.csv`),
+Output je Variante eine CSV unter `data/preprocessed/`.
 
 ## cleaned
-Roh → Freitext-/Leakage-Spalten entfernen → kategorisch **frequency-encoden**, numerisch median-imputieren + **StandardScaler** → Feature Engineering (z. B. `salary_avg`, Airbnb-ICC).
-→ rein numerische Tabelle.
+Rein numerische Tabelle (Freitext-/Leakage-Spalten entfernt, kategorisch frequency-/one-hot-encoded,
+numerisch median-imputiert + **StandardScaler**). Da beide Datensätze fachlich verschieden sind,
+wurde das `cleaned`-Preprocessing **pro Datensatz individuell** umgesetzt.
+
+### cleaned – Airbnb Paris
+`data/raw/airbnb_paris.csv` → `data/preprocessed/cleaned_airbnb_paris.csv`
+- **Spalten-Drop:** IDs/URLs/Scrape-Metadaten, redundante Review-Subscores und Review-Counts/-Daten,
+  `price`/`estimated_revenue_l365d` u. a. (Leakage bzw. Rauschen).
+- **Target (künstliches Proxy-Label):** Zeilen ohne `review_scores_rating` verworfen, dann nur
+  Bewertungen `== 5.0` oder `<= 3.0` behalten (Übergangsbereich 3–5 entfällt); `is_top_rating = (rating == 5)`,
+  Anomalie = nicht-Top-Rating.
+- **Feature Engineering:** `host_tenure_days` aus `host_since`; `host_response_rate`/`host_acceptance_rate`
+  von "%"-Strings zu Zahlen; `amenities_count`/`host_verifications_count` aus Listen-Strings;
+  `host_in_paris`/`host_in_france`/`host_location_missing` aus `host_location`; t/f-Spalten → 1/0.
+- **Imputation:** numerisch Median, Boolean Modus, kategorisch `"unknown"`; konstante Spalten gedroppt.
+- **Encoding:** `room_type`, `host_response_time` one-hot; `neighbourhood_cleansed`, `property_type`
+  **frequency-encoded**.
+- **Skalierung & Cleanup:** numerische + frequency-Spalten via **StandardScaler**; Spaltennamen
+  normalisiert (ASCII/lowercase); `review_scores_rating` und Freitextspalten entfernt.
+
+### cleaned – Fake Job Postings
+`data/raw/fake_job_postings.csv` → `data/preprocessed/cleaned_fake_jobs.csv`
+- **Target (natürliches Label):** `fraudulent` (1 = Anomalie), als Spalte am Ende beibehalten.
+- **Feature Engineering:** `location` in `country`/`state`/`city` gesplittet; `salary_range` →
+  `salary_avg` (Mittel aus Unter-/Obergrenze).
+- **Spalten-Drop:** IDs sowie alle Freitextspalten (`title`, `company_profile`, `description`,
+  `requirements`, `benefits`) und die schon zerlegten Roh-Spalten.
+- **Imputation:** kategorisch `"missing"`, `salary_avg` per Median.
+- **Encoding:** alle kategorischen Spalten (Industry, Function, Department, Land/State/City,
+  Employment-/Experience-/Education-Felder) **frequency-encoded**.
+- **Skalierung:** `salary_avg`, Binär-Flags (`telecommuting`, `has_company_logo`, `has_questions`)
+  und frequency-Spalten via **StandardScaler** (13 Features).
 
 ## cleaned_text
 `cleaned` **+** die originalen Freitextspalten (per `row_id` angehängt).
