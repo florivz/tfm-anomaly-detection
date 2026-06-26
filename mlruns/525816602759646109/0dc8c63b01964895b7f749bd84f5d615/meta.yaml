@@ -1,4 +1,4 @@
-artifact_uri: file:///home/debian/TFM_master_thesis/airbnb_notebooks/exp1/../../mlruns/525816602759646109/0dc8c63b01964895b7f749bd84f5d615/artifacts
+artifact_uri: file:///Users/fveitz/PycharmProjects/TFM_master_thesis/mlruns/525816602759646109/0dc8c63b01964895b7f749bd84f5d615/artifacts
 end_time: 1781087646204
 entry_point_name: ''
 experiment_id: '525816602759646109'

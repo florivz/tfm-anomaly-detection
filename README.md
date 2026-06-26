@@ -44,8 +44,7 @@ Die Label-Logik ist über alle Preprocessing-Varianten hinweg identisch.
 
 | Modellgruppe | Modelle | Train-Set |
 |---|---|---|
-| Unsupervised | iForest, LODA, ECOD, TabPFN (unsup.), FoMo-OD, AnoLLM | Originalverteilung, **ohne** Labels |
-| Semi-supervised (One-Class) | Auto-Encoder | **nur Inlier** |
+| Unsupervised | iForest, LODA, ECOD, Auto-Encoder, TabPFN (unsup.), FoMo-OD, AnoLLM | Originalverteilung, **ohne** Labels |
 | Supervised / Enhanced | TabPFN-Enhanced-Embeddings, ContextTab, TabPFN-classification | Originalverteilung, **mit** Labels |
 
 Kein Modell wird auf reinen Outliern trainiert.
@@ -105,7 +104,7 @@ Join aus `enhanced_pca30` + `semantic_pca30`. Hat kein eigenes Notebook und wird
 - Aufbau im Repo: `<datensatz>_notebooks/<exp>/notebook.ipynb`
 - **MLflow** loggt alle Ergebnisse nach dem Schema `<datensatz> → experiment_x`.
 - Speicherung im Ordner `mlruns` (keine Datenbank).
-- Geloggte Metriken: **AP** (Average Precision), **AUC-ROC** sowie die **Laufzeit** jedes Modells.
+- Geloggte Metriken: **AP** (Average Precision), **AUCPR** (Fläche unter der Precision-Recall-Kurve), **AUC-ROC** sowie die **Laufzeit** jedes Modells.
 
 ---
 
@@ -162,8 +161,10 @@ als Clone im Projektverzeichnis (`ShapPFN/`, `ExplainerPFN/`, gitignored).
 
 ### 📊 Resultate (`experiment_summary.ipynb`)
 
-* **Pro Experiment & Datensatz:** Tabelle mit **AP**, **AUROC** und `n_runs` (Exp 1/2/4); Bar-Charts für Exp 1/2/4.
-* **Experiment 3:** nur die SHAP-Relevanz-Tabelle (Feature bzw. numerisch vs. Freitext), kein Chart.
+* **Pro Experiment & Datensatz:** Tabelle mit **AP**, **AUCPR**, **AUROC** und `n_runs` (Exp 1/2/4); Bar-Charts (je Metrik) für Exp 1/2/4.
+* **Experiment 3:** SHAP-Relevanz-Tabelle (Feature bzw. numerisch vs. Freitext) **plus** Bar-Charts (Top-Features und Text vs. numerisch).
+* **Aggregation:** Durchschnitt über die **neuesten 3 Runs** je Modell (bzw. Detektor × Repräsentation).
+* **Export:** alle Tabellen werden zusätzlich als CSV unter `result_tables/expX_<datensatz>.csv` gespeichert.
 * Quelle: aggregierte MLflow-Runs aus `./mlruns`; fehlende Experimente werden übersprungen.
 
 ---
@@ -176,8 +177,8 @@ GridSearch, bestes Modell per AP auf dem Val-Split gewählt (beste Werte nach de
 
 | Modell | Suchraum | Beste Hyperparameter |
 |---|---|---|
-| iForest | `n_estimators ∈ {100, 200}`, `max_features ∈ {0.5, 1.0}` | `n_estimators=100`, `max_features=1.0` |
-| LODA | `n_bins ∈ {10, 20}`, `n_random_cuts ∈ {100, 200}` | `n_bins=20`, `n_random_cuts=200` |
+| iForest | `n_estimators ∈ {100, 200}`, `max_features ∈ {0.5, 1.0}` | `n_estimators=200`, `max_features=1.0` |
+| LODA | `n_bins ∈ {10, 20}`, `n_random_cuts ∈ {100, 200}` | `n_bins=20`, `n_random_cuts=100` |
 | ECOD | parameterfrei | — |
 | AutoEncoder | `hidden_neuron_list ∈ {[64,32], [32,16]}`, `epoch_num ∈ {20, 50}` | `hidden_neuron_list=[64,32]`, `epoch_num=20` |
 
@@ -185,10 +186,10 @@ GridSearch, bestes Modell per AP auf dem Val-Split gewählt (beste Werte nach de
 
 | Modell | Suchraum | Beste Hyperparameter |
 |---|---|---|
-| iForest | `n_estimators ∈ {100, 200}`, `max_features ∈ {0.5, 1.0}` | `n_estimators=100`, `max_features=1.0` |
-| LODA | `n_bins ∈ {10, 20}`, `n_random_cuts ∈ {100, 200}` | `n_bins=10`, `n_random_cuts=100` |
+| iForest | `n_estimators ∈ {100, 200}`, `max_features ∈ {0.5, 1.0}` | `n_estimators=100`, `max_features=0.5` |
+| LODA | `n_bins ∈ {10, 20}`, `n_random_cuts ∈ {100, 200}` | `n_bins=10`, `n_random_cuts=200` |
 | ECOD | parameterfrei | — |
-| AutoEncoder | `hidden_neuron_list ∈ {[64,32], [32,16]}`, `epoch_num ∈ {20, 50}` | `hidden_neuron_list=[64,32]`, `epoch_num=50` |
+| AutoEncoder | `hidden_neuron_list ∈ {[64,32], [32,16]}`, `epoch_num ∈ {20, 50}` | `hidden_neuron_list=[64,32]`, `epoch_num=20` |
 ---
 
 ## Limitationen

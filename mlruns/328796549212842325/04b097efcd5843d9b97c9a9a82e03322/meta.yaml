@@ -1,4 +1,4 @@
-artifact_uri: file:///home/debian/TFM_master_thesis/fake_job_notebooks/exp3/../../mlruns/328796549212842325/04b097efcd5843d9b97c9a9a82e03322/artifacts
+artifact_uri: file:///Users/fveitz/PycharmProjects/TFM_master_thesis/mlruns/328796549212842325/04b097efcd5843d9b97c9a9a82e03322/artifacts
 end_time: 1781087373093
 entry_point_name: ''
 experiment_id: '328796549212842325'
