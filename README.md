@@ -39,7 +39,7 @@ Die Label-Logik ist über alle Preprocessing-Varianten hinweg identisch.
 ## Train/Test-Aufbau
 
 - **Split:** stratifizierter Train/Test-Split (70/30), der die Outlier-Rate in beiden Teilen erhält.
-- **Test-Set:** behält **immer** die Originalverteilung an In- und Outliern und wird **nie** verändert (Exp 1/2). Nur so bleiben AP und AUC-ROC interpretierbar. **Ausnahme Exp 3/4:** balanciertes 1:4-Subset (Train 120/480, Test 30/120), da reiner TFM-Klassifikationsvergleich.
+- **Test-Set:** behält **immer** die Originalverteilung an In- und Outliern und wird **nie** verändert (Exp 1/2). Nur so bleiben AP, AUPRC und AUC-ROC interpretierbar. **Ausnahme Exp 3:** balanciertes 1:4-Subset (Train 120/480, Test 30/120). **Exp 4:** zwei Varianten je Modell — Originalverteilung (Train 4000 / Test 3000) und balanciert 1:4.
 - **Train-Set:** je nach Trainingsparadigma des Modells unterschiedlich gefüllt:
 
 | Modellgruppe | Modelle | Train-Set |
@@ -104,7 +104,7 @@ Join aus `enhanced_pca30` + `semantic_pca30`. Hat kein eigenes Notebook und wird
 - Aufbau im Repo: `<datensatz>_notebooks/<exp>/notebook.ipynb`
 - **MLflow** loggt alle Ergebnisse nach dem Schema `<datensatz> → experiment_x`.
 - Speicherung im Ordner `mlruns` (keine Datenbank).
-- Geloggte Metriken: **AP** (Average Precision), **AUCPR** (Fläche unter der Precision-Recall-Kurve), **AUC-ROC** sowie die **Laufzeit** jedes Modells.
+- Geloggte Metriken: **AP** (Average Precision), **AUPRC** (Area under the Precision-Recall Curve, trapezförmig via `precision_recall_curve` + `auc`), **AUC-ROC** sowie die **Laufzeit** jedes Modells.
 
 ---
 
@@ -132,7 +132,10 @@ SHAP-Analyse mit **SAP ConTextTab** als Klassifikator: es verarbeitet numerische
 ### Experiment 4 — TFMs zur binären Klassifikation
 Welches Modell ist besser für die binäre Klassifikation als Outlier Detection: **ContextTab** vs. **TabPFN classification**?
 
-- gemeinsames balanciertes 1:4-Subset (Train 120/480, Test 30/120, seed 42)
+- **zwei Verteilungs-Varianten je Modell** (als MLflow-Param `distribution` geloggt):
+  - `original`: Originalverteilung (~4–5 % Outlier), Train-Kontext 4000 (TabPFN-Limit), Test 3000
+  - `balanced_1to4`: künstlich balanciert (Train 120/480, Test 30/120)
+  - gemeinsame Zeilen für beide Modelle (seed 42) → fairer Vergleich
 - binäre Klassifikation des Labels (Airbnb per ICC, Fake Jobs natürliches `fraudulent`)
 - TabPFN: `cleaned` (numerisch skaliert, Kategorien frequency-encoded, Freitexte entfernt)
 - ConTextTab: `cleaned_text` (dieselben numerischen Features + originale Freitexte, nativ verarbeitet)
@@ -161,10 +164,8 @@ als Clone im Projektverzeichnis (`ShapPFN/`, `ExplainerPFN/`, gitignored).
 
 ### 📊 Resultate (`experiment_summary.ipynb`)
 
-* **Pro Experiment & Datensatz:** Tabelle mit **AP**, **AUCPR**, **AUROC** und `n_runs` (Exp 1/2/4); Bar-Charts (je Metrik) für Exp 1/2/4.
-* **Experiment 3:** SHAP-Relevanz-Tabelle (Feature bzw. numerisch vs. Freitext) **plus** Bar-Charts (Top-Features und Text vs. numerisch).
-* **Aggregation:** Durchschnitt über die **neuesten 3 Runs** je Modell (bzw. Detektor × Repräsentation).
-* **Export:** alle Tabellen werden zusätzlich als CSV unter `result_tables/expX_<datensatz>.csv` gespeichert.
+* **Pro Experiment & Datensatz:** Tabelle mit **AP**, **AUPRC**, **AUROC** und `n_runs` (Exp 1/2/4); Bar-Charts für Exp 1/2/4.
+* **Experiment 3:** nur die SHAP-Relevanz-Tabelle (Feature bzw. numerisch vs. Freitext), kein Chart.
 * Quelle: aggregierte MLflow-Runs aus `./mlruns`; fehlende Experimente werden übersprungen.
 
 ---
@@ -177,8 +178,8 @@ GridSearch, bestes Modell per AP auf dem Val-Split gewählt (beste Werte nach de
 
 | Modell | Suchraum | Beste Hyperparameter |
 |---|---|---|
-| iForest | `n_estimators ∈ {100, 200}`, `max_features ∈ {0.5, 1.0}` | `n_estimators=200`, `max_features=1.0` |
-| LODA | `n_bins ∈ {10, 20}`, `n_random_cuts ∈ {100, 200}` | `n_bins=20`, `n_random_cuts=100` |
+| iForest | `n_estimators ∈ {100, 200}`, `max_features ∈ {0.5, 1.0}` | `n_estimators=100`, `max_features=1.0` |
+| LODA | `n_bins ∈ {10, 20}`, `n_random_cuts ∈ {100, 200}` | `n_bins=20`, `n_random_cuts=200` |
 | ECOD | parameterfrei | — |
 | AutoEncoder | `hidden_neuron_list ∈ {[64,32], [32,16]}`, `epoch_num ∈ {20, 50}` | `hidden_neuron_list=[64,32]`, `epoch_num=20` |
 
@@ -186,10 +187,10 @@ GridSearch, bestes Modell per AP auf dem Val-Split gewählt (beste Werte nach de
 
 | Modell | Suchraum | Beste Hyperparameter |
 |---|---|---|
-| iForest | `n_estimators ∈ {100, 200}`, `max_features ∈ {0.5, 1.0}` | `n_estimators=100`, `max_features=0.5` |
-| LODA | `n_bins ∈ {10, 20}`, `n_random_cuts ∈ {100, 200}` | `n_bins=10`, `n_random_cuts=200` |
+| iForest | `n_estimators ∈ {100, 200}`, `max_features ∈ {0.5, 1.0}` | `n_estimators=100`, `max_features=1.0` |
+| LODA | `n_bins ∈ {10, 20}`, `n_random_cuts ∈ {100, 200}` | `n_bins=10`, `n_random_cuts=100` |
 | ECOD | parameterfrei | — |
-| AutoEncoder | `hidden_neuron_list ∈ {[64,32], [32,16]}`, `epoch_num ∈ {20, 50}` | `hidden_neuron_list=[64,32]`, `epoch_num=20` |
+| AutoEncoder | `hidden_neuron_list ∈ {[64,32], [32,16]}`, `epoch_num ∈ {20, 50}` | `hidden_neuron_list=[64,32]`, `epoch_num=50` |
 ---
 
 ## Limitationen
@@ -197,7 +198,7 @@ GridSearch, bestes Modell per AP auf dem Val-Split gewählt (beste Werte nach de
 ### Methodisch
 - **Data Leakage in den Enhanced-Varianten (Exp 2):** Die TabPFN-Embeddings werden auf dem Label trainiert, die Features tragen also Label-Information. Das überschätzt die Enhanced-Performance systematisch — die Varianten sind bewusst als **semi-supervised** eingeordnet und nicht direkt mit den unsupervised Pipelines vergleichbar.
 - **Künstliches Label bei Airbnb Paris (ICC):** Es gibt kein natürliches Anomalie-Label; der Proxy wird über `review_score_rating` definiert. Bewertungen 3–5 werden ausgeschlossen, wodurch der Übergangsbereich fehlt und das Problem künstlich leichter wird. Da Bewertungen subjektiv sind (≠ echte Anomalie), ist die Übertragbarkeit auf reale Szenarien eingeschränkt.
-- **Eingeschränkte Vergleichbarkeit von Exp 3/4:** Beide nutzen ein balanciertes 1:4-Subset statt der Originalverteilung. AP/AUROC sind dadurch nicht mit der natürlichen Outlier-Rate (~4–5 %) vergleichbar und beruhen auf kleinen Stichproben (150 Testzeilen).
+- **Eingeschränkte Vergleichbarkeit von Exp 3:** nutzt ein balanciertes 1:4-Subset statt der Originalverteilung; AP/AUROC sind dadurch nicht mit der natürlichen Outlier-Rate (~4–5 %) vergleichbar und beruhen auf einer kleinen Stichprobe (150 Testzeilen). **Exp 4** liefert zusätzlich die `original`-Variante (Originalverteilung, Test 3000), die diese Einschränkung adressiert; die `balanced_1to4`-Variante bleibt für den direkten Vergleich erhalten.
 
 ### Technisch (Hardware-Grenzen der A40-12C vGPU)
 - **AnoLLM:** Batchsize = 2 (sonst CUDA OOM).

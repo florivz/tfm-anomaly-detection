@@ -1,8 +1,0 @@
-artifact_location: file:///Users/fveitz/PycharmProjects/TFM_master_thesis/mlruns/394247669675461859
-creation_time: 1781090597525
-experiment_id: '394247669675461859'
-last_update_time: 1781090597525
-lifecycle_stage: active
-name: airbnb_paris_experiment_2
-trace_location: null
-workspace: default
