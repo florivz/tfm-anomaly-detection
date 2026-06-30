@@ -1,7 +1,7 @@
-,AP,AP,AP,AP,AP,AP,n_runs,n_runs,n_runs,n_runs,n_runs,n_runs
+,AUPRC,AUPRC,AUPRC,AUPRC,AUPRC,AUPRC,n_runs,n_runs,n_runs,n_runs,n_runs,n_runs
 params.representation,cleaned,enhanced,enhanced_pca30,enhanced_semantic_pca30,semantic_pca100,semantic_pca30,cleaned,enhanced,enhanced_pca30,enhanced_semantic_pca30,semantic_pca100,semantic_pca30
 params.detector,,,,,,,,,,,,
-autoencoder,0.0838,0.1822,0.0863,0.0936,0.0584,0.0712,3,3,3,3,3,3
-ecod,0.0759,0.1162,0.11,0.0825,0.046,0.0587,3,3,3,3,3,3
-iforest,0.0876,0.1158,0.1496,0.1109,0.057,0.0869,3,3,3,3,3,3
-loda,0.0723,0.1531,0.1237,0.0448,0.0452,0.0387,3,3,3,3,3,3
+autoencoder,0.0816,0.1793,0.0849,0.0919,0.0573,0.0696,3,3,3,3,3,3
+ecod,0.0745,0.1142,0.1074,0.0814,0.0457,0.058,3,3,3,3,3,3
+iforest,0.0858,0.113,0.1453,0.1083,0.056,0.0842,3,3,3,3,3,3
+loda,0.0705,0.1503,0.1208,0.0445,0.0448,0.0384,3,3,3,3,3,3
