@@ -117,6 +117,8 @@ Wie schlagen sich TFMs im unsupervised Setting?
 - **Baselines (PyOD):** iForest, Auto-Encoder, LODA, ECOD — per GridSearch hyperparameter-optimiert
 - **Daten:** `cleaned` für alle Modelle.
   Ausnahme: **AnoLLM** bekommt **lesbare Rohwerte** direkt aus `raw` (Kategorien/Ort/Datum als Strings, %-Raten als Zahl, 5/4 Freitexte; Leakage-/ID-Spalten entfernt) — es serialisiert jede Zeile als Text, daher sind encodierte/skalierte Werte ungeeignet.
+- **Gemeinsamer Split:** alle Modelle nutzen denselben stratifizierten 70/30-Split, definiert über den stabilen `row_id`-Schlüssel (seed 42) → **identisches Test-Set** für jeden Vergleich; nur die *Repräsentation* je Zeile unterscheidet sich (AnoLLM Text, Rest numerisch).
+- **Score-Richtung:** jede Methode wird mit ihrer **nativen** Score-Orientierung ausgewertet (höher = anomaler); es wird **nicht** anhand der Test-Labels umgedreht — gilt einheitlich für TFMs und Baselines.
 
 ### Experiment 2 — Enhanced Baseline-Modelle
 Die Baseline-Modelle werden auf verschiedenen Repräsentationen trainiert und verglichen:
