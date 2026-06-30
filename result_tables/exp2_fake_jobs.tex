@@ -1,0 +1,16 @@
+\begin{table}
+\caption{Experiment 2 -- Enhanced Baselines (fake jobs): AUPRC und n\_runs je Detektor und Repräsentation.}
+\label{tab:exp2_fake_jobs}
+\begin{tabular}{lrrrrrrrrrrrr}
+\toprule
+ & \multicolumn{6}{c}{AUPRC} & \multicolumn{6}{c}{n\_runs} \\
+params.representation & cleaned & enhanced & enhanced\_pca30 & enhanced\_semantic\_pca30 & semantic\_pca100 & semantic\_pca30 & cleaned & enhanced & enhanced\_pca30 & enhanced\_semantic\_pca30 & semantic\_pca100 & semantic\_pca30 \\
+params.detector &  &  &  &  &  &  &  &  &  &  &  &  \\
+\midrule
+autoencoder & 0.0816 & 0.1793 & 0.0849 & 0.0919 & 0.0573 & 0.0696 & 3 & 3 & 3 & 3 & 3 & 3 \\
+ecod & 0.0745 & 0.1142 & 0.1074 & 0.0814 & 0.0457 & 0.0580 & 3 & 3 & 3 & 3 & 3 & 3 \\
+iforest & 0.0858 & 0.1130 & 0.1453 & 0.1083 & 0.0560 & 0.0842 & 3 & 3 & 3 & 3 & 3 & 3 \\
+loda & 0.0705 & 0.1503 & 0.1208 & 0.0445 & 0.0448 & 0.0384 & 3 & 3 & 3 & 3 & 3 & 3 \\
+\bottomrule
+\end{tabular}
+\end{table}

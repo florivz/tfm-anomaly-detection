@@ -1,0 +1,16 @@
+\begin{table}
+\caption{Experiment 2 -- Enhanced Baselines (airbnb paris): AUPRC und n\_runs je Detektor und Repräsentation.}
+\label{tab:exp2_airbnb_paris}
+\begin{tabular}{lrrrrrrrrrrrr}
+\toprule
+ & \multicolumn{6}{c}{AUPRC} & \multicolumn{6}{c}{n\_runs} \\
+params.representation & cleaned & enhanced & enhanced\_pca30 & enhanced\_semantic\_pca30 & semantic\_pca100 & semantic\_pca30 & cleaned & enhanced & enhanced\_pca30 & enhanced\_semantic\_pca30 & semantic\_pca100 & semantic\_pca30 \\
+params.detector &  &  &  &  &  &  &  &  &  &  &  &  \\
+\midrule
+autoencoder & 0.0711 & 0.2296 & 0.1298 & 0.1424 & 0.0433 & 0.0506 & 3 & 3 & 3 & 3 & 3 & 3 \\
+ecod & 0.1058 & 0.0598 & 0.2697 & 0.1434 & 0.0651 & 0.0821 & 3 & 3 & 3 & 3 & 3 & 3 \\
+iforest & 0.0867 & 0.1234 & 0.2291 & 0.1012 & 0.0675 & 0.0786 & 3 & 3 & 3 & 3 & 3 & 3 \\
+loda & 0.0878 & 0.0760 & 0.1919 & 0.0627 & 0.0504 & 0.0657 & 3 & 3 & 3 & 3 & 3 & 3 \\
+\bottomrule
+\end{tabular}
+\end{table}
