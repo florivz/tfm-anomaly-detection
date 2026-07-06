@@ -4,24 +4,55 @@ Evaluierung von **Tabular Foundation Models (TFMs)** für die Outlier Detection.
 
 ---
 
+## Projektdaten
+
+* **Institution:** TH Köln
+* **Kooperationspartner:** inovex GmbH
+
+### Beteiligte Personen
+* **Autor:** Florian Veitz ([fveitz@smail.th-koeln.de](mailto:fveitz@smail.th-koeln.de))
+* **Prüfer:** Prof. Dr. Gernot Heisenberg ([gernot.heisenberg@th-koeln.de](mailto:gernot.heisenberg@th-koeln.de))
+* **Zweitprüfer:** Dr. Mehmet Hakan Akdag ([hakan.akdag@th-koeln.de](mailto:hakan.akdag@th-koeln.de))
+* **Ansprechpartner inovex:** Dr. Darjan Salaj ([darjan.salaj@inovex.de](mailto:darjan.salaj@inovex.de))
+---
+
 ## Setup
 
 ### Umgebung
 - **Paketmanager:** [`uv`](https://docs.astral.sh/uv/) — muss installiert sein.
 - **Ausführung:** lokal in PyCharm, per SSH an eine VM gekoppelt (`ssh debian@185.113.124.164`); lokale Änderungen werden auf die VM hochgeladen.
 - **GPU:** vGPU **NVIDIA A40-12C** auf der VM (für TabPFN, ConTextTab, AnoLLM nötig).
-
-### Schnellstart (vorhandene Ergebnisse ansehen)
-1. `uv sync` — Abhängigkeiten installieren.
-2. `experiment_summary.ipynb` ausführen — aggregiert die bestehenden MLflow-Runs aus `./mlruns` zu Tabellen/Charts.
+- 
+### Schnellstart (Ergebnisse ansehen)
+1. **Github Repo clonen:** git clone https://github.com/florivz/TFM_master_thesis.git
+2. **`uv sync`** — Abhängigkeiten installieren.
+3. **`mlruns` einrichten** — Ordner im Projekt-Root erstellen und Daten aus [Sciebo](https://th-koeln.sciebo.de/s/DyxqLqP3yAS2Z2J) einfügen.
+4. **`experiment_summary.ipynb` ausführen** — Aggregiert bestehende Runs aus `./mlruns`.
 
 ### Eigene Experimente reproduzieren
-1. **Roh-Daten** laden: <https://th-koeln.sciebo.de/s/QDa6WLKEPFMrM5g/download> → nach `data/raw/`.
-2. **Preprocessing-Pipelines** ausführen (`<datensatz>_notebooks/preprocessing/`) → erzeugt die CSVs in `data/preprocessed/`.
-3. **Foundation-Modelle** je nach Experiment als Submodul/Clone hinzufügen (entsprechend dem jeweiligen Paper; für Exp 5 siehe dort die separate `venv_explainerpfn`).
-4. **Experiment-Notebooks** ausführen (`<datensatz>_notebooks/<exp>/`) → loggt nach `./mlruns`.
-5. `mlruns` ggf. mit der VM synchronisieren.
-6. `experiment_summary.ipynb` für die Gesamtauswertung ausführen.
+1. **Github Repo clonen:** git clone https://github.com/florivz/TFM_master_thesis.git
+2. **Rohdaten:** Von [Sciebo](https://th-koeln.sciebo.de/s/FJzqqF7RpSr8Hdj/download) nach `data/raw/` laden.
+3. **Preprocessing:** Vorverarbeitete Daten von [Sciebo](https://th-koeln.sciebo.de/s/wyKrtxdTy4ACPr8/download) nach `data/preprocessed/` laden (optional Notebooks unter `airbnb_notebooks` / `fakejobs_notebooks` ausführen).
+4. **Foundation-Modelle:** Als Submodul/Klon hinzufügen (für Exp 5 die `venv_explainerpfn` nutzen).
+5. **MLflow-Basis:** Falls noch nicht geschehen, `mlruns` via [Sciebo](https://th-koeln.sciebo.de/s/DyxqLqP3yAS2Z2J) im Root bereitstellen.
+6. **Notebooks ausführen:** `<datensatz>_notebooks/<exp>/` starten (loggt nach `./mlruns`).
+7. **Auswertung:** `mlruns` ggf. mit VM synchronisieren und `experiment_summary.ipynb` ausführen.
+
+---
+
+## Repository-Struktur
+
+* **`data/`**
+  * `raw/` — Unverarbeitete Rohdaten
+  * `preprocessed/` — Bereinigte und transformierte Daten (8 Varianten)
+* **`<dataset>_notebooks/`**
+  * `preprocessing/` — Notebooks zur Datenvorverarbeitung
+  * `exp/` — Notebooks zur Durchführung der Experimente 1–5
+* **`descriptions/`** — Ausführliche Markdown-Dokumentationen (`.md`)
+* **`diagrams/`** — Generierte Ergebnisdiagramme (Bar-Charts, SHAP-Plots)
+* **`result_tables/`** — Exportierte Ergebnistabellen (CSV/LaTeX)
+* **`mlruns/`** — Lokales MLflow-Verzeichnis (Logdateien der Modell-Runs)
+* **`experiment_summary.ipynb`** — Zentrales Notebook zur Gesamtauswertung
 
 ---
 
@@ -49,62 +80,29 @@ Die Label-Logik ist über alle Preprocessing-Varianten hinweg identisch.
 
 Kein Modell wird auf reinen Outliern trainiert.
 
-Weitere Informationen siehe: **descriptions &rArr; data_descriptions.md**
+Weitere Informationen siehe: [Detaillierte Beschreibung der Daten](descriptions/data_description.md)
 
 ---
 
 ## TFM Modellanforderungen
 
-siehe: **descriptions &rArr; tfm_model_requirements.md**
+siehe [Modellanforderungen](descriptions/tfm_model_requirements.md)
 
 ## Preprocessing-Pipelines
 
 Beide Datensätze werden in **8 Varianten** aufbereitet und unter
-`data/preprocessed/<sinnvoller_name_englisch>.csv` gespeichert.
+`data/preprocessed/<datensatz>.csv` gespeichert.
 Die zugehörigen Notebooks liegen unter
-`<datensatz>_notebooks/preprocessing/<sinnvoller_name_englisch>.ipynb`.
+`<datensatz>_notebooks/preprocessing/<notebook>.ipynb`.
 
-- **Kein Train/Test-Split im Preprocessing:** Jede Variante wird als **eine einzige CSV** gespeichert (nicht in `_train`/`_test` unterteilt). Der stratifizierte 70/30-Split erfolgt erst in den Experiment-Notebooks.
-
-### 1. cleaned
-Roh → Freitext-/Leakage-Spalten entfernen → kategorisch **frequency-encoden**, numerisch median-imputieren + **StandardScaler** → Feature Engineering (z. B. `salary_avg`; Airbnb: ICC, `host_tenure_days`, Listen-Counts, Host-Flags).
-→ rein numerische Tabelle.
-
-### 2. cleaned_text
-`cleaned` **+** die originalen Freitextspalten (per `row_id` angehängt).
-→ numerisch/encoded + Roh-Freitexte (für **AnoLLM** / **ConTextTab**).
-
-### 3. semantic
-`cleaned_text` → jede **Freitextzelle** per Sentence-Transformer (`all-mpnet-base-v2`) einbetten (+ Spaltennamen-Embedding addiert); Freitextspalten ersetzt durch ihre Embedding-Vektoren.
-→ numerisch/encoded + Text-Embeddings (hochdimensional).
-
-### 4. semantic_pca100
-`semantic` → **PCA 100** über die Text-Embeddings.
-→ numerisch/encoded + 100 Text-PCA-Komponenten.
-
-### 5. semantic_pca30
-`semantic` → **PCA 30** über die Text-Embeddings (erklärte Varianz > 80 %).
-→ numerisch/encoded + 30 Text-PCA-Komponenten.
-
-### 6. enhanced
-`cleaned` (Text entfernt) → **TabPFN** auf das Label fitten → `get_embeddings` (~192-dim).
-→ nur TabPFN-Embeddings (keine Roh-Features).
-
-### 7. enhanced_pca30
-`enhanced` → **PCA 30** über die TabPFN-Embeddings (erklärte Varianz > 80 %).
-→ nur 30 TabPFN-Embedding-PCA-Komponenten.
-
-### 8. enhanced_semantic_pca30
-Join aus `enhanced_pca30` + `semantic_pca30`. Hat kein eigenes Notebook und wird erst in **Experiment 2** gebaut. Details zu allen Pipelines: `descriptions/pipeline_descriptions.md`.
-
----
+- für weitere Infos siehe [Detaillierte Pipeline Beschreibung](descriptions/pipeline_description.md)
 
 ## Experiment-Struktur
 
 - Aufbau im Repo: `<datensatz>_notebooks/<exp>/notebook.ipynb`
 - **MLflow** loggt alle Ergebnisse nach dem Schema `<datensatz> → experiment_x`.
 - Speicherung im Ordner `mlruns` (keine Datenbank).
-- Geloggte Metriken: **AP** (Average Precision), **AUPRC** (Area under the Precision-Recall Curve, trapezförmig via `precision_recall_curve` + `auc`), **AUC-ROC** sowie die **Laufzeit** jedes Modells.
+- Geloggte Metriken:  **AUPRC** (Area under the Precision-Recall Curve), **AP** (Average Precision), **AUC-ROC** sowie die **Laufzeit** jedes Modells.
 
 ---
 
@@ -142,39 +140,17 @@ Welches Modell ist besser für die binäre Klassifikation als Outlier Detection:
 - TabPFN: `cleaned` (numerisch skaliert, Kategorien frequency-encoded, Freitexte entfernt)
 - ConTextTab: `cleaned_text` (dieselben numerischen Features + originale Freitexte, nativ verarbeitet)
 
-### Experiment 5 – TFM Erklärbarkeit
-
-Vergleich zweier moderner TFM-Explainer gegen KernelSHAP als Baseline auf einem TabPFN-Klassifikator
-(`cleaned`-Features, numerisch). Setup analog Exp. 3: seed 42, 1:4 Outlier/Inlier-Ratio,
-30 Erklär-Zeilen. Verglichen werden `mean|attr|` je Feature, Fidelity vs. KernelSHAP
-(Spearman + Cosine) und Laufzeit.
-
-- **KernelSHAP** – modell-agnostische Baseline (Gold-Standard)
-- **ShapPFN** – SHAP-Werte als Nebenprodukt des Forward Pass (`kunumi/ShapPFN`)
-- **ExplainerPFN** – Zero-Shot Explainer; benötigt TabPFN 2.1.2 → separate `venv_explainerpfn`
-  (Haupt-Env nutzt TabPFN 2.5)
-
-**Limitationen:** Alle Methoden werden einheitlich auf m ≤ 8 Features und n ≤ 200 Zeilen
-evaluiert (gemeinsame Obergrenze beider PFN-Explainer). Stratifiziertes 1:4-Sampling sichert
-stabile Attributionen trotz kleiner Stichprobe. ExplainerPFN erfordert zusätzlich einen
-Standard Scaler auf den `cleaned`-Features. Experiment 5 beschränkt sich auf die `cleaned`-Pipeline (numerische Features).
-Semantische und Freitext-Pipelines werden nicht evaluiert
-
-**Notebooks:** `explainers.ipynb` (KernelSHAP + ShapPFN, Haupt-`.venv`, erzeugt
-`ref_kernelshap.csv`) → danach `explainerpfn.ipynb` (`venv_explainerpfn`). Beide Repos
-als Clone im Projektverzeichnis (`ShapPFN/`, `ExplainerPFN/`, gitignored).
-
 ### 📊 Resultate (`experiment_summary.ipynb`)
 
-* **Pro Experiment & Datensatz:** Tabelle mit **AP**, **AUPRC**, **AUROC** und `n_runs` (Exp 1/2/4); Bar-Charts für Exp 1/2/4.
-* **Experiment 3:** nur die SHAP-Relevanz-Tabelle (Feature bzw. numerisch vs. Freitext), kein Chart.
+* **Pro Experiment & Datensatz:** Tabelle mit **AUPRC**, **AUROC** und `n_runs` (Exp 1/2/4); Bar-Charts für Exp 1/2/4/5.
+* **Experiment 3:** SHAP-Relevanz-Tabelle (Feature bzw. numerisch vs. Freitext) plus Bar-Charts (Top-20-Features und Text vs. numerisch).
 * Quelle: aggregierte MLflow-Runs aus `./mlruns`; fehlende Experimente werden übersprungen.
 
 ---
 
 ## Baseline-Hyperparameter (Experiment 1)
 
-GridSearch, bestes Modell per AP auf dem Val-Split gewählt (beste Werte nach dem Lauf aus MLflow eintragen).
+GridSearch, bestes Modell auf dem Val-Split gewählt (beste Werte nach dem Lauf aus MLflow).
 
 ### Fake Jobs
 
