@@ -33,10 +33,15 @@ Evaluierung von **Tabular Foundation Models (TFMs)** für die Outlier Detection.
 1. **Github Repo clonen:** git clone https://github.com/florivz/TFM_master_thesis.git
 2. **Rohdaten:** Von [Sciebo](https://th-koeln.sciebo.de/s/FJzqqF7RpSr8Hdj/download) nach `data/raw/` laden.
 3. **Preprocessing:** Vorverarbeitete Daten von [Sciebo](https://th-koeln.sciebo.de/s/wyKrtxdTy4ACPr8/download) nach `data/preprocessed/` laden (optional Notebooks unter `airbnb_notebooks` / `fakejobs_notebooks` ausführen).
-4. **Foundation-Modelle:** Als Submodul/Klon hinzufügen (für Exp 5 die `venv_explainerpfn` nutzen).
-5. **MLflow-Basis:** Falls noch nicht geschehen, `mlruns` via [Sciebo](https://th-koeln.sciebo.de/s/DyxqLqP3yAS2Z2J) im Root bereitstellen.
+4. **Foundation-Modelle:** AnoLLM (`anollm_src/`) und FoMo-0D (`FoMo-0D/`) liegen bereits im Repo (vendored, siehe [`VENDORED_SOURCES.md`](VENDORED_SOURCES.md)); TabPFN und ConTextTab kommen über `uv sync`. Gewichte siehe [Modellgewichte](#modellgewichte). (Exp 5 nutzt die `venv_explainerpfn`.)
+5. **MLflow-Basis:** Falls noch nicht geschehen, `mlruns` via [Sciebo](https://th-koeln.sciebo.de/s/DyxqLqP3yAS2Z2J/download) im Root bereitstellen.
 6. **Notebooks ausführen:** `<datensatz>_notebooks/<exp>/` starten (loggt nach `./mlruns`).
 7. **Auswertung:** `mlruns` ggf. mit VM synchronisieren und `experiment_summary.ipynb` ausführen.
+
+### Modellgewichte
+- **Automatisch von HuggingFace** (beim ersten Lauf, Internet nötig, **kein Token / kein `.env`**): TabPFN, ConTextTab (`rpt-1-oss`) und das AnoLLM-Basismodell `HuggingFaceTB/SmolLM-135M`.
+- **Manuell — nur FoMo-0D:** Der Checkpoint wird **nicht** automatisch geladen. `ckpt.zip` (~32 MB) von HuggingFace [`YuchenShen/FoMo-0D`](https://huggingface.co/YuchenShen/FoMo-0D) herunterladen und nach `FoMo-0D/ckpt.zip` legen (das Notebook entpackt es selbst nach `FoMo-0D/ckpt/`).
+- **PyOD-Baselines** (iForest, LODA, ECOD, Auto-Encoder) haben keine vortrainierten Gewichte — sie werden pro Lauf trainiert.
 
 ---
 
