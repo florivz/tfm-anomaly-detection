@@ -44,13 +44,10 @@ data/raw/*.csv
 .DS_Store
 Thumbs.db
 
-FoMo-0D/
-anollm_src/
 ShapPFN/
 ExplainerPFN/
 venv_explainerpfn/
 CLAUDE.md
-*.lock
 mlruns/*
 
 .env
