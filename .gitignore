@@ -49,5 +49,5 @@ ExplainerPFN/
 venv_explainerpfn/
 CLAUDE.md
 mlruns/*
-
+.claude
 .env
