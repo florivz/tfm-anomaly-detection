@@ -48,7 +48,6 @@ ShapPFN/
 ExplainerPFN/
 venv_explainerpfn/
 CLAUDE.md
-*.lock
 mlruns/*
 
 .env

@@ -14,8 +14,9 @@ self-contained and reproducible.
 - No git metadata was present in the local copy, so no exact commit is recorded.
 - License: see `FoMo-0D/LICENSE`
 - **Not included in git:** `FoMo-0D/ckpt.zip` (~32 MB pretrained checkpoint,
-  excluded via `*.zip`). Obtain it from the upstream project and place it at
-  `FoMo-0D/ckpt.zip` before running FoMo-0D.
+  excluded via `*.zip`). Download it from the HuggingFace model page
+  https://huggingface.co/YuchenShen/FoMo-0D and place it at `FoMo-0D/ckpt.zip`
+  before running FoMo-0D (the notebook unzips it into `FoMo-0D/ckpt/`).
 
 Generated result files and model weights inside these folders are excluded by
 `.gitignore` (repo root) and by the vendored projects' own nested `.gitignore`
