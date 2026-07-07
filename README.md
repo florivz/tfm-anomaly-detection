@@ -19,10 +19,10 @@ Evaluierung von **Tabular Foundation Models (TFMs)** für die Outlier Detection.
 ## Setup
 
 ### Umgebung
-- **Paketmanager:** [`uv`](https://docs.astral.sh/uv/) — muss installiert sein.
-- **Ausführung:** lokal in PyCharm, per SSH an eine VM gekoppelt (`ssh debian@185.113.124.164`); lokale Änderungen werden auf die VM hochgeladen.
-- **GPU:** vGPU **NVIDIA A40-12C** auf der VM (für TabPFN, ConTextTab, AnoLLM nötig).
-- 
+- **Paketmanager:** [`uv`](https://docs.astral.sh/uv/) — muss installiert sein. `uv sync` richtet Python 3.13 und alle Abhängigkeiten automatisch ein.
+- **Hardware:** CUDA-fähige GPU für die TFMs (TabPFN, ConTextTab, AnoLLM, FoMo-0D); in dieser Arbeit vGPU **NVIDIA A40-12C**. PyOD-Baselines und die Auswertung (`experiment_summary.ipynb`) laufen auch ohne GPU.
+- **Internet:** für den einmaligen Download der Modellgewichte von HuggingFace (siehe [Modellgewichte](#modellgewichte)).
+
 ### Schnellstart (Ergebnisse ansehen)
 1. **Github Repo clonen:** git clone https://github.com/florivz/TFM_master_thesis.git
 2. **`uv sync`** — Abhängigkeiten installieren.
@@ -31,12 +31,13 @@ Evaluierung von **Tabular Foundation Models (TFMs)** für die Outlier Detection.
 
 ### Eigene Experimente reproduzieren
 1. **Github Repo clonen:** git clone https://github.com/florivz/TFM_master_thesis.git
-2. **Rohdaten:** Von [Sciebo](https://th-koeln.sciebo.de/s/FJzqqF7RpSr8Hdj/download) nach `data/raw/` laden.
-3. **Preprocessing:** Vorverarbeitete Daten von [Sciebo](https://th-koeln.sciebo.de/s/wyKrtxdTy4ACPr8/download) nach `data/preprocessed/` laden (optional Notebooks unter `airbnb_notebooks` / `fakejobs_notebooks` ausführen).
-4. **Foundation-Modelle:** AnoLLM (`anollm_src/`) und FoMo-0D (`FoMo-0D/`) liegen bereits im Repo (vendored, siehe [`VENDORED_SOURCES.md`](VENDORED_SOURCES.md)); TabPFN und ConTextTab kommen über `uv sync`. Gewichte siehe [Modellgewichte](#modellgewichte). (Exp 5 nutzt die `venv_explainerpfn`.)
-5. **MLflow-Basis:** Falls noch nicht geschehen, `mlruns` via [Sciebo](https://th-koeln.sciebo.de/s/DyxqLqP3yAS2Z2J/download) im Root bereitstellen.
-6. **Notebooks ausführen:** `<datensatz>_notebooks/<exp>/` starten (loggt nach `./mlruns`).
-7. **Auswertung:** `mlruns` ggf. mit VM synchronisieren und `experiment_summary.ipynb` ausführen.
+2. **`uv sync`** — Python-Umgebung + Abhängigkeiten installieren.
+3. **Rohdaten:** Von [Sciebo](https://th-koeln.sciebo.de/s/FJzqqF7RpSr8Hdj/download) nach `data/raw/` laden.
+4. **Preprocessing:** Vorverarbeitete Daten von [Sciebo](https://th-koeln.sciebo.de/s/wyKrtxdTy4ACPr8/download) nach `data/preprocessed/` laden (optional Notebooks unter `airbnb_notebooks` / `fakejobs_notebooks` ausführen).
+5. **Foundation-Modelle & Gewichte:** AnoLLM (`anollm_src/`) und FoMo-0D (`FoMo-0D/`) liegen bereits im Repo (vendored, siehe [`VENDORED_SOURCES.md`](VENDORED_SOURCES.md)); TabPFN und ConTextTab kommen über `uv sync`. Für FoMo-0D zusätzlich den Checkpoint besorgen — Details unter [Modellgewichte](#modellgewichte).
+6. **MLflow-Basis:** Falls noch nicht geschehen, `mlruns` via [Sciebo](https://th-koeln.sciebo.de/s/DyxqLqP3yAS2Z2J/download) im Root bereitstellen.
+7. **Notebooks ausführen:** `<datensatz>_notebooks/<exp1–exp4>/` starten (loggt nach `./mlruns`). *Exp 5 (ShapPFN/ExplainerPFN) ist nicht im Repo enthalten und hier nicht abgedeckt.*
+8. **Auswertung:** `mlruns` ggf. mit VM synchronisieren und `experiment_summary.ipynb` ausführen.
 
 ### Modellgewichte
 - **Automatisch von HuggingFace** (beim ersten Lauf, Internet nötig, **kein Token / kein `.env`**): TabPFN, ConTextTab (`rpt-1-oss`) und das AnoLLM-Basismodell `HuggingFaceTB/SmolLM-135M`.
