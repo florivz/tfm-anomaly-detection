@@ -73,6 +73,7 @@ Die Cleaned-Pipeline (`fake_job_notebooks/preprocessing/cleaned.ipynb`) leitet a
 | **Cleaned** | `preprocessing/cleaned.ipynb` | 13 numerische Features (Text entfernt) + `row_id` | `cleaned_fake_jobs.csv` |
 | **Cleaned + Freitexte** | `preprocessing/cleaned_text.ipynb` | Cleaned + 5 Rohtexte | `cleaned_text_fake_jobs.csv` |
 | **Semantisch / Enhanced** | `preprocessing/{semantic,enhanced}*.ipynb` | Sentence-Transformer- bzw. TabPFN-Embeddings | `{semantic,enhanced}*_fake_jobs.csv` |
+| **FastText** | `preprocessing/fast_text.ipynb` | Cleaned + fastText-Text-Embeddings (PCA 30/100) | `fast_text_pca{30,100}_fake_jobs.csv` |
 
 ---
 
@@ -179,3 +180,4 @@ Konstruktion in `airbnb_notebooks/preprocessing/cleaned.ipynb`:
 | **Cleaned** | `preprocessing/cleaned.ipynb` | numerische Features (Text entfernt) + `row_id` | `cleaned_airbnb_paris.csv` |
 | **Cleaned + Freitexte** | `preprocessing/cleaned_text.ipynb` | Cleaned + 4 Rohtexte | `cleaned_text_airbnb_paris.csv` |
 | **Semantisch / Enhanced** | `preprocessing/{semantic,enhanced}*.ipynb` | Sentence-Transformer- bzw. TabPFN-Embeddings | `{semantic,enhanced}*_airbnb_paris.csv` |
+| **FastText** | `preprocessing/fast_text.ipynb` | Cleaned + fastText-Text-Embeddings (PCA 30/100) | `fast_text_pca{30,100}_airbnb_paris.csv` |
