@@ -36,7 +36,7 @@ Evaluierung von **Tabular Foundation Models (TFMs)** für die Outlier Detection.
 4. **Preprocessing:** Vorverarbeitete Daten von [Sciebo](https://th-koeln.sciebo.de/s/wyKrtxdTy4ACPr8/download) nach `data/preprocessed/` laden (optional Notebooks unter `airbnb_notebooks` / `fakejobs_notebooks` ausführen).
 5. **Foundation-Modelle & Gewichte:** AnoLLM (`anollm_src/`) und FoMo-0D (`FoMo-0D/`) liegen bereits im Repo (vendored, siehe [`VENDORED_SOURCES.md`](VENDORED_SOURCES.md)); TabPFN und ConTextTab kommen über `uv sync`. Für FoMo-0D zusätzlich den Checkpoint besorgen — Details unter [Modellgewichte](#modellgewichte).
 6. **MLflow-Basis:** Falls noch nicht geschehen, `mlruns` via [Sciebo](https://th-koeln.sciebo.de/s/DyxqLqP3yAS2Z2J/download) im Root bereitstellen.
-7. **Notebooks ausführen:** `<datensatz>_notebooks/<exp1–exp4>/` starten (loggt nach `./mlruns`). *Exp 5 (ShapPFN/ExplainerPFN) ist nicht im Repo enthalten und hier nicht abgedeckt.*
+7. **Notebooks ausführen:** `<datensatz>_notebooks/<exp1–exp4>/` starten (loggt nach `./mlruns`).
 8. **Auswertung:** `mlruns` ggf. mit VM synchronisieren und `experiment_summary.ipynb` ausführen.
 
 ### Modellgewichte
@@ -53,7 +53,7 @@ Evaluierung von **Tabular Foundation Models (TFMs)** für die Outlier Detection.
   * `preprocessed/` — Bereinigte und transformierte Daten (8 Varianten)
 * **`<dataset>_notebooks/`**
   * `preprocessing/` — Notebooks zur Datenvorverarbeitung
-  * `exp/` — Notebooks zur Durchführung der Experimente 1–5
+  * `exp/` — Notebooks zur Durchführung der Experimente 1–4
 * **`descriptions/`** — Ausführliche Markdown-Dokumentationen (`.md`)
 * **`diagrams/`** — Generierte Ergebnisdiagramme (Bar-Charts, SHAP-Plots)
 * **`result_tables/`** — Exportierte Ergebnistabellen (CSV/LaTeX)
@@ -101,6 +101,7 @@ Beide Datensätze werden in **8 Varianten** aufbereitet und unter
 Die zugehörigen Notebooks liegen unter
 `<datensatz>_notebooks/preprocessing/<notebook>.ipynb`.
 
+- Zusätzlich zu den Sentence-Transformer-Varianten (`semantic*`) gibt es die **fastText**-Varianten `fast_text_pca30` / `fast_text_pca100` (gleiche Pipeline, Freitext-Embeddings per fastText statt Sentence-Transformer).
 - für weitere Infos siehe [Detaillierte Pipeline Beschreibung](descriptions/pipeline_description.md)
 
 ## Experiment-Struktur
@@ -126,7 +127,12 @@ Wie schlagen sich TFMs im unsupervised Setting?
 
 ### Experiment 2 — Enhanced Baseline-Modelle
 Die Baseline-Modelle werden auf verschiedenen Repräsentationen trainiert und verglichen:
-`cleaned` (rein numerisch), `semantic_pca100`, `semantic_pca30`, `enhanced`, `enhanced_pca30` sowie `enhanced_semantic_pca30` (Join aus enhanced_pca30 + semantic_pca30).
+`cleaned` (rein numerisch), `semantic_pca100`, `semantic_pca30`, `fast_text_pca100`, `fast_text_pca30`, `enhanced`, `enhanced_pca30` sowie `enhanced_semantic_pca30` (Join aus enhanced_pca30 + semantic_pca30).
+
+### FastText-Freitext-Embeddings (Zusatzvergleich)
+Alternative Text-Repräsentation zu den Sentence-Transformer-Embeddings: Die Freitextspalten werden per **fastText** (unsupervised skipgram, 100d je Spalte, + Spaltennamen-Embedding, LayerNorm) eingebettet und per PCA auf 30 bzw. 100 Komponenten reduziert → `fast_text_pca30` / `fast_text_pca100` (Notebooks `<datensatz>_notebooks/preprocessing/fast_text.ipynb`).
+
+Das Notebook `<datensatz>_notebooks/fast_text.ipynb` vergleicht die Baseline-Detektoren (beste Hyperparameter aus der README, kein GridSearch, **kein MLflow**) bei identischer numerischer Basis über drei Repräsentationen — **ohne Text**, **fastText** und **Sentence-Transformer** (`semantic_pca30`) — und gibt aus, welche Text-Repräsentation am besten funktioniert (AP/AUPRC/AUC-ROC + Classification Report).
 
 ### Experiment 3 — Semantische Relevanz
 SHAP-Analyse mit **SAP ConTextTab** als Klassifikator: es verarbeitet numerische Features und Freitexte nativ (eine Spalte = ein Feature), daher ist die Relevanz jeder Freitextspalte direkt messbar.
@@ -148,7 +154,7 @@ Welches Modell ist besser für die binäre Klassifikation als Outlier Detection:
 
 ### 📊 Resultate (`experiment_summary.ipynb`)
 
-* **Pro Experiment & Datensatz:** Tabelle mit **AUPRC**, **AUROC** und `n_runs` (Exp 1/2/4); Bar-Charts für Exp 1/2/4/5.
+* **Pro Experiment & Datensatz:** Tabelle mit **AUPRC**, **AUROC** und `n_runs` (Exp 1/2/4); Bar-Charts für Exp 1/2/4.
 * **Experiment 3:** SHAP-Relevanz-Tabelle (Feature bzw. numerisch vs. Freitext) plus Bar-Charts (Top-20-Features und Text vs. numerisch).
 * Quelle: aggregierte MLflow-Runs aus `./mlruns`; fehlende Experimente werden übersprungen.
 

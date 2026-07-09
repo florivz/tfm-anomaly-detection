@@ -44,9 +44,6 @@ data/raw/*.csv
 .DS_Store
 Thumbs.db
 
-ShapPFN/
-ExplainerPFN/
-venv_explainerpfn/
 CLAUDE.md
 mlruns/*
 .claude
