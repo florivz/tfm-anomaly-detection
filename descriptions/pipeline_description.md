@@ -54,6 +54,10 @@ wurde das `cleaned`-Preprocessing **pro Datensatz individuell** umgesetzt.
 `semantic` → **PCA 30** über die Text-Embeddings (erklärte Varianz > 80 %).
 → numerisch/encoded + 30 Text-PCA-Komponenten.
 
+## fast_text_pca30 / fast_text_pca100
+`cleaned_text` → jede **Freitextzelle** per unsupervised **fastText** (skipgram, 100d) einbetten (+ Spaltennamen-Embedding addiert, per-Vektor-LayerNorm) → **PCA 30** bzw. **PCA 100** über den Embedding-Block; Freitextspalten entfernt. Gleiche Pipeline wie `semantic`, nur mit fastText statt Sentence-Transformer.
+→ numerisch/encoded + 30 bzw. 100 Text-PCA-Komponenten.
+
 ## enhanced
 `cleaned` (Text entfernt) → **TabPFN** auf das Label fitten → `get_embeddings` (~192-dim).
 → nur TabPFN-Embeddings (keine Roh-Features).
