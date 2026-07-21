@@ -1,196 +1,162 @@
-# TFM Master Thesis
+# Tabular Foundation Models for Outlier Detection
 
-Evaluierung von **Tabular Foundation Models (TFMs)** für die Outlier Detection. Die TFMs werden mit Baseline-Modellen verglichen, zusätzlich werden Strategien zur besseren Nutzung von **Freitext-Features** untersucht.
+Evaluation of **Tabular Foundation Models (TFMs)** for outlier detection. The TFMs are benchmarked against baselines, and additional strategies for exploiting **free-text features** are investigated.
 
----
+**Author:** Florian Veitz — TH Köln, in cooperation with inovex GmbH.
 
-## Projektdaten
-
-* **Institution:** TH Köln
-* **Kooperationspartner:** inovex GmbH
-
-### Beteiligte Personen
-* **Autor:** Florian Veitz ([fveitz@smail.th-koeln.de](mailto:fveitz@smail.th-koeln.de))
-* **Prüfer:** Prof. Dr. Gernot Heisenberg ([gernot.heisenberg@th-koeln.de](mailto:gernot.heisenberg@th-koeln.de))
-* **Zweitprüfer:** Dr. Mehmet Hakan Akdag ([hakan.akdag@th-koeln.de](mailto:hakan.akdag@th-koeln.de))
-* **Ansprechpartner inovex:** Dr. Darjan Salaj ([darjan.salaj@inovex.de](mailto:darjan.salaj@inovex.de))
 ---
 
 ## Setup
 
-### Umgebung
-- **Paketmanager:** [`uv`](https://docs.astral.sh/uv/) — muss installiert sein. `uv sync` richtet Python 3.13 und alle Abhängigkeiten automatisch ein.
-- **Hardware:** CUDA-fähige GPU für die TFMs (TabPFN, ConTextTab, AnoLLM, FoMo-0D); in dieser Arbeit vGPU **NVIDIA A40-12C**. PyOD-Baselines und die Auswertung (`experiment_summary.ipynb`) laufen auch ohne GPU.
-- **Internet:** für den einmaligen Download der Modellgewichte von HuggingFace (siehe [Modellgewichte](#modellgewichte)).
+### Environment
+- **Package manager:** [`uv`](https://docs.astral.sh/uv/) — must be installed. `uv sync` sets up Python 3.13 and all dependencies automatically.
+- **Hardware:** a CUDA-capable GPU for the TFMs (TabPFN, ConTextTab, AnoLLM, FoMo-0D); this work used an **NVIDIA A40-12C** vGPU. The PyOD baselines and the evaluation (`experiment_summary.ipynb`) also run without a GPU.
+- **Internet:** required once to download the model weights from HuggingFace (see [Model weights](#model-weights)).
 
-### Schnellstart (Ergebnisse ansehen)
-1. **Github Repo clonen:** git clone https://github.com/florivz/TFM_master_thesis.git
-2. **`uv sync`** — Abhängigkeiten installieren.
-3. **`mlruns` einrichten** — Ordner im Projekt-Root erstellen und Daten aus [Sciebo](https://th-koeln.sciebo.de/s/DyxqLqP3yAS2Z2J) einfügen.
-4. **`experiment_summary.ipynb` ausführen** — Aggregiert bestehende Runs aus `./mlruns`.
+### Quick start (view results)
+1. **Clone the repo:** `git clone https://github.com/florivz/tfm-anomaly-detection.git`
+2. **`uv sync`** — install dependencies.
+3. **Set up `mlruns`** — create the folder in the project root and add the data from [Sciebo](https://th-koeln.sciebo.de/s/DyxqLqP3yAS2Z2J).
+4. **Run `experiment_summary.ipynb`** — aggregates the existing runs from `./mlruns`.
 
-### Eigene Experimente reproduzieren
-1. **Github Repo clonen:** git clone https://github.com/florivz/TFM_master_thesis.git
-2. **`uv sync`** — Python-Umgebung + Abhängigkeiten installieren.
-3. **Rohdaten:** Von [Sciebo](https://th-koeln.sciebo.de/s/FJzqqF7RpSr8Hdj/download) nach `data/raw/` laden.
-4. **Preprocessing:** Vorverarbeitete Daten von [Sciebo](https://th-koeln.sciebo.de/s/wyKrtxdTy4ACPr8/download) nach `data/preprocessed/` laden (optional Notebooks unter `airbnb_notebooks` / `fakejobs_notebooks` ausführen).
-5. **Foundation-Modelle & Gewichte:** AnoLLM (`anollm_src/`) und FoMo-0D (`FoMo-0D/`) liegen bereits im Repo (vendored, siehe [`VENDORED_SOURCES.md`](VENDORED_SOURCES.md)); TabPFN und ConTextTab kommen über `uv sync`. Für FoMo-0D zusätzlich den Checkpoint besorgen — Details unter [Modellgewichte](#modellgewichte).
-6. **MLflow-Basis:** Falls noch nicht geschehen, `mlruns` via [Sciebo](https://th-koeln.sciebo.de/s/DyxqLqP3yAS2Z2J/download) im Root bereitstellen.
-7. **Notebooks ausführen:** `<datensatz>_notebooks/<exp1–exp4>/` starten (loggt nach `./mlruns`).
-8. **Auswertung:** `mlruns` ggf. mit VM synchronisieren und `experiment_summary.ipynb` ausführen.
+### Reproduce experiments
+1. **Clone the repo** and run **`uv sync`**.
+2. **Raw data:** download from [Sciebo](https://th-koeln.sciebo.de/s/FJzqqF7RpSr8Hdj/download) into `data/raw/`.
+3. **Preprocessed data:** download from [Sciebo](https://th-koeln.sciebo.de/s/wyKrtxdTy4ACPr8/download) into `data/preprocessed/` (or run the notebooks under `airbnb_notebooks` / `fake_job_notebooks`).
+4. **Foundation models & weights:** AnoLLM (`anollm_src/`) and FoMo-0D (`FoMo-0D/`) are vendored in the repo (see [`VENDORED_SOURCES.md`](VENDORED_SOURCES.md)); TabPFN and ConTextTab come via `uv sync`. FoMo-0D additionally needs its checkpoint — see [Model weights](#model-weights).
+5. **MLflow base:** if not done yet, provide `mlruns` from [Sciebo](https://th-koeln.sciebo.de/s/DyxqLqP3yAS2Z2J/download) in the root.
+6. **Run the notebooks:** `<dataset>_notebooks/<exp1–exp4>/` (logs to `./mlruns`).
+7. **Evaluate:** run `experiment_summary.ipynb`.
 
-### Modellgewichte
-- **Automatisch von HuggingFace** (beim ersten Lauf, Internet nötig, **kein Token / kein `.env`**): TabPFN, ConTextTab (`rpt-1-oss`) und das AnoLLM-Basismodell `HuggingFaceTB/SmolLM-135M`.
-- **Manuell — nur FoMo-0D:** Der Checkpoint wird **nicht** automatisch geladen. `ckpt.zip` (~32 MB) von HuggingFace [`YuchenShen/FoMo-0D`](https://huggingface.co/YuchenShen/FoMo-0D) herunterladen und nach `FoMo-0D/ckpt.zip` legen (das Notebook entpackt es selbst nach `FoMo-0D/ckpt/`).
-- **PyOD-Baselines** (iForest, LODA, ECOD, Auto-Encoder) haben keine vortrainierten Gewichte — sie werden pro Lauf trainiert.
-
----
-
-## Repository-Struktur
-
-* **`data/`**
-  * `raw/` — Unverarbeitete Rohdaten
-  * `preprocessed/` — Bereinigte und transformierte Daten (8 Varianten)
-* **`<dataset>_notebooks/`**
-  * `preprocessing/` — Notebooks zur Datenvorverarbeitung
-  * `exp/` — Notebooks zur Durchführung der Experimente 1–4
-* **`descriptions/`** — Ausführliche Markdown-Dokumentationen (`.md`)
-* **`diagrams/`** — Generierte Ergebnisdiagramme (Bar-Charts, SHAP-Plots)
-* **`result_tables/`** — Exportierte Ergebnistabellen (CSV/LaTeX)
-* **`mlruns/`** — Lokales MLflow-Verzeichnis (Logdateien der Modell-Runs)
-* **`experiment_summary.ipynb`** — Zentrales Notebook zur Gesamtauswertung
+### Model weights
+- **Automatic from HuggingFace** (on first run, internet required, **no token / no `.env`**): TabPFN, ConTextTab (`rpt-1-oss`), and the AnoLLM base model `HuggingFaceTB/SmolLM-135M`.
+- **Manual — FoMo-0D only:** the checkpoint is **not** fetched automatically. Download `ckpt.zip` (~32 MB) from HuggingFace [`YuchenShen/FoMo-0D`](https://huggingface.co/YuchenShen/FoMo-0D) into `FoMo-0D/ckpt.zip` (the notebook unpacks it to `FoMo-0D/ckpt/`).
+- **PyOD baselines** (iForest, LODA, ECOD, Auto-Encoder) have no pretrained weights — they are trained per run.
 
 ---
 
-## Daten
+## Repository structure
 
-| Datensatz | Label | Logik |
+* **`data/`** — `raw/` (unprocessed) and `preprocessed/` (cleaned/transformed, 9 variants)
+* **`<dataset>_notebooks/`** — `preprocessing/` and `exp/` (Experiments 1–4)
+* **`descriptions/`** — technical appendix: [datasets & preprocessing variants](descriptions/data_description.md), [TFM input requirements](descriptions/tfm_model_requirements.md)
+* **`diagrams/`** — generated result plots (bar charts, SHAP plots)
+* **`result_tables/`** — exported result tables (CSV/LaTeX)
+* **`mlruns/`** — local MLflow directory (run logs)
+* **`experiment_summary.ipynb`** — central evaluation notebook
+
+---
+
+## Data
+
+| Dataset | Label | Logic |
 |---|---|---|
-| **Fake Job Postings** (`data/raw`) | natürlich | `Fraudulent` = Outlier, sonst Inlier |
-| **Airbnb Paris** | per ICC (In-Class Classification) | `review_score_rating == 5` = Inlier, `<= 3` = Outlier |
+| **Fake Job Postings** | natural | `fraudulent = 1` → outlier |
+| **Airbnb Paris** | In-Class Classification (ICC) | `review_score_rating == 5` → inlier, `<= 3` → outlier |
 
-Die Label-Logik ist über alle Preprocessing-Varianten hinweg identisch.
+The label logic is identical across all preprocessing variants. See [detailed data description](descriptions/data_description.md).
 
 ---
 
-## Train/Test-Aufbau
+## Train/test setup
 
-- **Split:** stratifizierter Train/Test-Split (70/30), der die Outlier-Rate in beiden Teilen erhält.
-- **Test-Set:** behält **immer** die Originalverteilung an In- und Outliern und wird **nie** verändert (Exp 1/2). Nur so bleiben AP, AUPRC und AUC-ROC interpretierbar. **Ausnahme Exp 3:** balanciertes 1:4-Subset (Train 120/480, Test 30/120). **Exp 4:** zwei Varianten je Modell — Originalverteilung (Train 4000 / Test 3000) und balanciert 1:4.
-- **Train-Set:** je nach Trainingsparadigma des Modells unterschiedlich gefüllt:
+- **Split:** stratified 70/30 train/test split that preserves the outlier rate in both parts, keyed on the stable `row_id` (seed 42) → an **identical test set** for every comparison.
+- **Test set:** always keeps the original in-/outlier distribution and is **never** modified (Exp 1/2), so AP, AUPRC, and AUC-ROC stay interpretable. **Exp 3:** balanced 1:4 subset (train 120/480, test 30/120). **Exp 4:** two variants per model — original distribution (train 4000 / test 3000) and balanced 1:4.
+- **Train set:** filled differently depending on the model's training paradigm:
 
-| Modellgruppe | Modelle | Train-Set |
+| Group | Models | Train set |
 |---|---|---|
-| Unsupervised | iForest, LODA, ECOD, Auto-Encoder, TabPFN (unsup.), FoMo-OD, AnoLLM | Originalverteilung, **ohne** Labels |
-| Supervised / Enhanced | TabPFN-Enhanced-Embeddings, ContextTab, TabPFN-classification | Originalverteilung, **mit** Labels |
+| Unsupervised | iForest, LODA, ECOD, Auto-Encoder, TabPFN (unsup.), FoMo-0D, AnoLLM | original distribution, **without** labels |
+| Supervised / Enhanced | TabPFN-Enhanced-Embeddings, ConTextTab, TabPFN-classification | original distribution, **with** labels |
 
-Kein Modell wird auf reinen Outliern trainiert.
-
-Weitere Informationen siehe: [Detaillierte Beschreibung der Daten](descriptions/data_description.md)
+No model is trained on outliers only.
 
 ---
 
-## TFM Modellanforderungen
+## Model requirements & preprocessing
 
-siehe [Modellanforderungen](descriptions/tfm_model_requirements.md)
-
-## Preprocessing-Pipelines
-
-Beide Datensätze werden in **8 Varianten** aufbereitet und unter
-`data/preprocessed/<datensatz>.csv` gespeichert.
-Die zugehörigen Notebooks liegen unter
-`<datensatz>_notebooks/preprocessing/<notebook>.ipynb`.
-
-- Zusätzlich zu den Sentence-Transformer-Varianten (`semantic*`) gibt es die **fastText**-Varianten `fast_text_pca30` / `fast_text_pca100` (gleiche Pipeline, Freitext-Embeddings per fastText statt Sentence-Transformer).
-- für weitere Infos siehe [Detaillierte Pipeline Beschreibung](descriptions/pipeline_description.md)
-
-## Experiment-Struktur
-
-- Aufbau im Repo: `<datensatz>_notebooks/<exp>/notebook.ipynb`
-- **MLflow** loggt alle Ergebnisse nach dem Schema `<datensatz> → experiment_x`.
-- Speicherung im Ordner `mlruns` (keine Datenbank).
-- Geloggte Metriken:  **AUPRC** (Area under the Precision-Recall Curve), **AP** (Average Precision), **AUC-ROC** sowie die **Laufzeit** jedes Modells.
+- **TFM input requirements:** see [model requirements](descriptions/tfm_model_requirements.md).
+- **Preprocessing pipelines:** both datasets are prepared in **9 variants** (`cleaned`, `cleaned_text`, `semantic`, `semantic_pca100/30`, `fast_text_pca100/30`, `enhanced`, `enhanced_pca30`) under `data/preprocessed/`, with notebooks in `<dataset>_notebooks/preprocessing/`. See [preprocessing variants](descriptions/data_description.md#3-preprocessing-variants).
 
 ---
 
-## Experimente
+## Experiments
 
-### Experiment 1 — Unsupervised Outlier Detection
-Wie schlagen sich TFMs im unsupervised Setting?
+Layout: `<dataset>_notebooks/<exp>/notebook.ipynb`. **MLflow** logs all results as `<dataset> → experiment_x` into `mlruns` (no database). Logged metrics: **AUPRC**, **AP** (Average Precision), **AUC-ROC**, and each model's **runtime**.
 
-- **TFMs:** TabPFN (unsupervised), AnoLLM, FoMo-OD
-- **Baselines (PyOD):** iForest, Auto-Encoder, LODA, ECOD — per GridSearch hyperparameter-optimiert
-- **Daten:** `cleaned` für alle Modelle.
-  Ausnahme: **AnoLLM** bekommt **lesbare Rohwerte** direkt aus `raw` (Kategorien/Ort/Datum als Strings, %-Raten als Zahl, 5/4 Freitexte; Leakage-/ID-Spalten entfernt) — es serialisiert jede Zeile als Text, daher sind encodierte/skalierte Werte ungeeignet.
-- **Gemeinsamer Split:** alle Modelle nutzen denselben stratifizierten 70/30-Split, definiert über den stabilen `row_id`-Schlüssel (seed 42) → **identisches Test-Set** für jeden Vergleich; nur die *Repräsentation* je Zeile unterscheidet sich (AnoLLM Text, Rest numerisch).
-- **Score-Richtung:** jede Methode wird mit ihrer **nativen** Score-Orientierung ausgewertet (höher = anomaler); es wird **nicht** anhand der Test-Labels umgedreht — gilt einheitlich für TFMs und Baselines.
+**Numbering in the repo vs. in the thesis:** the repository keeps its original numbering (notebook folders, MLflow experiment names, `result_tables/exp*`), because renaming would mean re-running everything. In the thesis, the SHAP study is only a **preliminary experiment**, which shifts the numbering of the following experiment:
 
-### Experiment 2 — Enhanced Baseline-Modelle
-Die Baseline-Modelle werden auf verschiedenen Repräsentationen trainiert und verglichen:
-`cleaned` (rein numerisch), `semantic_pca100`, `semantic_pca30`, `fast_text_pca100`, `fast_text_pca30`, `enhanced`, `enhanced_pca30` sowie `enhanced_semantic_pca30` (Join aus enhanced_pca30 + semantic_pca30).
-
-### FastText-Freitext-Embeddings (Zusatzvergleich)
-Alternative Text-Repräsentation zu den Sentence-Transformer-Embeddings: Die Freitextspalten werden per **fastText** (unsupervised skipgram, 100d je Spalte, + Spaltennamen-Embedding, LayerNorm) eingebettet und per PCA auf 30 bzw. 100 Komponenten reduziert → `fast_text_pca30` / `fast_text_pca100` (Notebooks `<datensatz>_notebooks/preprocessing/fast_text.ipynb`).
-
-Das Notebook `<datensatz>_notebooks/fast_text.ipynb` vergleicht die Baseline-Detektoren (beste Hyperparameter aus der README, kein GridSearch, **kein MLflow**) bei identischer numerischer Basis über drei Repräsentationen — **ohne Text**, **fastText** und **Sentence-Transformer** (`semantic_pca30`) — und gibt aus, welche Text-Repräsentation am besten funktioniert (AP/AUPRC/AUC-ROC + Classification Report).
-
-### Experiment 3 — Semantische Relevanz
-SHAP-Analyse mit **SAP ConTextTab** als Klassifikator: es verarbeitet numerische Features und Freitexte nativ (eine Spalte = ein Feature), daher ist die Relevanz jeder Freitextspalte direkt messbar.
-
-- Daten: `cleaned_text`; balanciertes 1:4-Subset (120/480) als In-Context-Train, eine Stichprobe Zeilen wird erklärt.
-- **KernelExplainer** (modell-agnostisch) liefert pro Feature einen mittleren |SHAP|-Wert.
-- Ausgabe: Tabelle der SHAP-Werte je Feature + aggregierte Summe **numerisch vs. Freitext**.
-
-### Experiment 4 — TFMs zur binären Klassifikation
-Welches Modell ist besser für die binäre Klassifikation als Outlier Detection: **ContextTab** vs. **TabPFN classification**?
-
-- **zwei Verteilungs-Varianten je Modell** (als MLflow-Param `distribution` geloggt):
-  - `original`: Originalverteilung (~4–5 % Outlier), Train-Kontext 4000 (TabPFN-Limit), Test 3000
-  - `balanced_1to4`: künstlich balanciert (Train 120/480, Test 30/120)
-  - gemeinsame Zeilen für beide Modelle (seed 42) → fairer Vergleich
-- binäre Klassifikation des Labels (Airbnb per ICC, Fake Jobs natürliches `fraudulent`)
-- TabPFN: `cleaned` (numerisch skaliert, Kategorien frequency-encoded, Freitexte entfernt)
-- ConTextTab: `cleaned_text` (dieselben numerischen Features + originale Freitexte, nativ verarbeitet)
-
-### 📊 Resultate (`experiment_summary.ipynb`)
-
-* **Pro Experiment & Datensatz:** Tabelle mit **AUPRC**, **AUROC** und `n_runs` (Exp 1/2/4); Bar-Charts für Exp 1/2/4.
-* **Experiment 3:** SHAP-Relevanz-Tabelle (Feature bzw. numerisch vs. Freitext) plus Bar-Charts (Top-20-Features und Text vs. numerisch).
-* Quelle: aggregierte MLflow-Runs aus `./mlruns`; fehlende Experimente werden übersprungen.
-
----
-
-## Baseline-Hyperparameter (Experiment 1)
-
-GridSearch, bestes Modell auf dem Val-Split gewählt (beste Werte nach dem Lauf aus MLflow).
-
-### Fake Jobs
-
-| Modell | Suchraum | Beste Hyperparameter |
+| Repo (notebooks, MLflow, `result_tables/`) | Thesis | Topic |
 |---|---|---|
-| iForest | `n_estimators ∈ {100, 200}`, `max_features ∈ {0.5, 1.0}` | `n_estimators=100`, `max_features=1.0` |
-| LODA | `n_bins ∈ {10, 20}`, `n_random_cuts ∈ {100, 200}` | `n_bins=20`, `n_random_cuts=200` |
-| ECOD | parameterfrei | — |
-| AutoEncoder | `hidden_neuron_list ∈ {[64,32], [32,16]}`, `epoch_num ∈ {20, 50}` | `hidden_neuron_list=[64,32]`, `epoch_num=20` |
+| Experiment 1 | Experiment 1 | Unsupervised outlier detection |
+| Experiment 2 | Experiment 2 | Enhanced baseline models |
+| **Experiment 3** | **Preliminary experiment (Vorexperiment)** | Semantic relevance (SHAP) |
+| **Experiment 4** | **Experiment 3** | TFMs for binary classification |
 
-### Airbnb Paris
+### Experiment 1 — Unsupervised outlier detection
+*Thesis: Experiment 1*
 
-| Modell | Suchraum | Beste Hyperparameter |
-|---|---|---|
-| iForest | `n_estimators ∈ {100, 200}`, `max_features ∈ {0.5, 1.0}` | `n_estimators=100`, `max_features=1.0` |
-| LODA | `n_bins ∈ {10, 20}`, `n_random_cuts ∈ {100, 200}` | `n_bins=10`, `n_random_cuts=100` |
-| ECOD | parameterfrei | — |
-| AutoEncoder | `hidden_neuron_list ∈ {[64,32], [32,16]}`, `epoch_num ∈ {20, 50}` | `hidden_neuron_list=[64,32]`, `epoch_num=50` |
+How do TFMs perform in an unsupervised setting?
+
+- **TFMs:** TabPFN (unsupervised), AnoLLM, FoMo-0D
+- **Baselines (PyOD):** iForest, Auto-Encoder, LODA, ECOD — hyperparameter-tuned via grid search
+- **Data:** `cleaned` for all models. Exception: **AnoLLM** receives **readable raw values** from `raw` (categories/location/date as strings, rates as numbers, free texts; leakage/ID columns removed), since it serializes each row as text.
+- **Score direction:** each method is evaluated with its **native** score orientation (higher = more anomalous); scores are **not** flipped based on the test labels.
+
+### Experiment 2 — Enhanced baseline models
+*Thesis: Experiment 2*
+
+Baselines trained and compared on **8 representations**: `cleaned` (numeric only), `semantic_pca100`, `semantic_pca30`, `fast_text_pca100`, `fast_text_pca30`, `enhanced`, `enhanced_pca30`, and `enhanced_semantic_pca30` (join of `enhanced_pca30` + `semantic_pca30`, built in the notebook itself). The question is which free-text representation helps the classical detectors most — see [preprocessing variants](descriptions/data_description.md#3-preprocessing-variants) for what each one contains.
+
+### Experiment 3 — Semantic relevance
+*Thesis: preliminary experiment (Vorexperiment), not a numbered experiment*
+
+SHAP analysis with **SAP ConTextTab** as classifier: it processes numeric features and free texts natively (one column = one feature), so the relevance of each free-text column is directly measurable.
+
+- Data: `cleaned_text`; balanced 1:4 subset (120/480) as in-context train, a sample of rows is explained.
+- **KernelExplainer** (model-agnostic) yields a mean |SHAP| value per feature.
+- Output: per-feature SHAP table + aggregated sum **numeric vs. free text**.
+
+### Experiment 4 — TFMs for binary classification
+*Thesis: Experiment 3*
+
+Which model is better for binary classification as outlier detection: **ConTextTab** vs. **TabPFN classification**?
+
+- **Two distribution variants per model** (logged as MLflow param `distribution`):
+  - `original`: original distribution (~4–5 % outliers), train context 4000 (TabPFN limit), test 3000
+  - `balanced_1to4`: artificially balanced (train 120/480, test 30/120)
+  - shared rows for both models (seed 42) → fair comparison
+- TabPFN: `cleaned` (numeric scaled, categories frequency-encoded, free texts removed)
+- ConTextTab: `cleaned_text` (same numeric features + original free texts, processed natively)
+
+### Results (`experiment_summary.ipynb`)
+- **Per experiment & dataset:** table with **AUPRC**, **AUROC**, and `n_runs` (Exp 1/2/4); bar charts for Exp 1/2/4.
+- **Experiment 3:** SHAP relevance table (per feature and numeric vs. free text) plus bar charts (top-20 features and text vs. numeric).
+- Source: aggregated MLflow runs from `./mlruns`; missing experiments are skipped.
+- All names and file prefixes (`exp1`–`exp4`) follow the **repo numbering** — see the mapping table above for the thesis numbering.
+
 ---
 
-## Limitationen
+## Baseline hyperparameters (Experiment 1)
 
-### Methodisch
-- **Data Leakage in den Enhanced-Varianten (Exp 2):** Die TabPFN-Embeddings werden auf dem Label trainiert, die Features tragen also Label-Information. Das überschätzt die Enhanced-Performance systematisch — die Varianten sind bewusst als **semi-supervised** eingeordnet und nicht direkt mit den unsupervised Pipelines vergleichbar.
-- **Künstliches Label bei Airbnb Paris (ICC):** Es gibt kein natürliches Anomalie-Label; der Proxy wird über `review_score_rating` definiert. Bewertungen 3–5 werden ausgeschlossen, wodurch der Übergangsbereich fehlt und das Problem künstlich leichter wird. Da Bewertungen subjektiv sind (≠ echte Anomalie), ist die Übertragbarkeit auf reale Szenarien eingeschränkt.
-- **Eingeschränkte Vergleichbarkeit von Exp 3:** nutzt ein balanciertes 1:4-Subset statt der Originalverteilung; AP/AUROC sind dadurch nicht mit der natürlichen Outlier-Rate (~4–5 %) vergleichbar und beruhen auf einer kleinen Stichprobe (150 Testzeilen). **Exp 4** liefert zusätzlich die `original`-Variante (Originalverteilung, Test 3000), die diese Einschränkung adressiert; die `balanced_1to4`-Variante bleibt für den direkten Vergleich erhalten.
+Grid search; best model chosen on the validation split.
 
-### Technisch (Hardware-Grenzen der A40-12C vGPU)
-- **AnoLLM:** Batchsize = 2 (sonst CUDA OOM).
-- **TabPFN:** max. 4000 Zeilen als Kontext (Attention skaliert quadratisch in der Sample-Anzahl).
-- **Semantische Embeddings:** PCA zwingend nötig — ohne Dimensionsreduktion erzeugen die Freitext-Embeddings tausende Features und sprengen den GPU-Speicher.
+| Model | Search space | Fake Jobs | Airbnb Paris |
+|---|---|---|---|
+| iForest | `n_estimators ∈ {100, 200}`, `max_features ∈ {0.5, 1.0}` | `n_estimators=100`, `max_features=1.0` | `n_estimators=100`, `max_features=1.0` |
+| LODA | `n_bins ∈ {10, 20}`, `n_random_cuts ∈ {100, 200}` | `n_bins=20`, `n_random_cuts=200` | `n_bins=10`, `n_random_cuts=100` |
+| ECOD | parameter-free | — | — |
+| AutoEncoder | `hidden_neuron_list ∈ {[64,32], [32,16]}`, `epoch_num ∈ {20, 50}` | `[64,32]`, `epoch_num=20` | `[64,32]`, `epoch_num=50` |
+
+---
+
+## Limitations
+
+### Methodological
+- **Data leakage in the Enhanced variants (Exp 2):** the TabPFN embeddings are trained on the label, so the features carry label information. This systematically overestimates Enhanced performance — the variants are deliberately classified as **semi-supervised** and are not directly comparable to the unsupervised pipelines.
+- **Artificial label for Airbnb Paris (ICC):** there is no natural anomaly label; the proxy is defined via `review_score_rating`. Ratings between 3 and 5 are excluded, removing the transition region and making the problem artificially easier. Since ratings are subjective (≠ true anomaly), transferability to real scenarios is limited.
+
+### Technical (A40-12C vGPU limits)
+- **AnoLLM:** batch size = 2 (otherwise CUDA OOM).
+- **TabPFN:** max. 4000 context rows (attention scales quadratically in the number of samples).
+- **Semantic embeddings:** PCA is mandatory — without dimensionality reduction the free-text embeddings produce thousands of features and exceed GPU memory.

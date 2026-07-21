@@ -1,5 +1,5 @@
 model,AUPRC,AUROC,runtime_s
-contexttab_balanced_1to4,0.9144,0.9651,2.76
-contexttab_original,0.9039,0.9912,31.6167
-tabpfn_classification_balanced_1to4,0.8345,0.9439,2.2233
-tabpfn_classification_original,0.7195,0.9332,4.6
+contexttab_balanced_1to4,0.9144 ± 0.0000,0.9651 ± 0.0000,2.7600 ± 0.6248
+contexttab_original,0.9039 ± 0.0000,0.9912 ± 0.0000,31.6167 ± 6.7346
+tabpfn_classification_balanced_1to4,0.8345 ± 0.0000,0.9439 ± 0.0000,2.2233 ± 0.1582
+tabpfn_classification_original,0.7195 ± 0.0000,0.9332 ± 0.0000,4.6000 ± 1.3202
