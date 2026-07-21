@@ -1,144 +1,134 @@
-# TFM-Modell-Anforderungen
+# TFM model requirements
 
-Dieses Dokument beschreibt die **datentechnischen Eingabe-Anforderungen** der im Projekt verwendeten Tabular Foundation Models (TFMs). Es geht um das, was jedes Modell strukturell als Input erwartet — unabhängig vom konkreten Einsatz im Notebook.
+Input requirements of the Tabular Foundation Models (TFMs) used in this project — what each model structurally expects as input, independent of its concrete use in the notebooks.
 
-Behandelte Modelle:
-
-1. [TabPFN 2.5 (Klassifikator → Embedding-Extraktor)](#1-tabpfn-25-klassifikator--embedding-extraktor)
-2. [TabPFN-Unsupervised (Native OD)](#2-tabpfn-unsupervised-native-od)
-3. [ConTextTab (SAP-rpt-1-oss)](#3-contexttab-sap-rpt-1-oss)
-4. [AnoLLM (Qwen2.5-0.5B + LoRA)](#4-anollm-qwen25-05b--lora)
-5. [FoMo-OD](#5-fomo-od)
-
-Eine kompakte Übersicht steht am Ende: [Constraints auf einen Blick](#-constraints-auf-einen-blick).
+Models covered: TabPFN 2.5, TabPFN-Unsupervised, ConTextTab, AnoLLM, FoMo-0D. A compact overview is at the end.
 
 ---
 
-## 1. TabPFN 2.5 (Klassifikator → Embedding-Extraktor)
+## 1. TabPFN 2.5 (classifier → embedding extractor)
 
-Verwendung im Projekt: nicht als OD-Modell, sondern als **Embedding-Refinement-Schritt** (`get_embeddings`) — das vortrainierte Modell wird auf Inlier-Kontext gefittet und liefert für jede Zeile einen Repräsentations-Vektor, der nachgelagert an klassische Detektoren (kNN, AE, iForest, …) übergeben wird.
+Used not as an OD model but as an **embedding-refinement step** (`get_embeddings`) — the pretrained model is fit on inlier context and returns a representation vector per row, passed downstream to classical detectors (kNN, AE, iForest, …).
 
-| Anforderung | Detail |
+| Requirement | Detail |
 |---|---|
-| **Aufgabe** | Klassifikation / Regression (in-context); Embedding über `get_embeddings()` |
-| **Datentyp** | Numerisch; kategorische Features als Integer-Codes |
-| **Text** | Nicht unterstützt — Freitexte müssen vorab eingebettet werden (z. B. Sentence-Transformer + PCA) |
-| **Kategorisch** | Über Integer-Codes; intern als kategorial deklarierbar |
-| **Fehlende Werte** | Werden teilweise toleriert, jedoch nicht robust |
-| **Feature-Anzahl** | **Praktisch ≤ 500** — Architektur-Soft-Limit; bei höheren Dimensionen Performance-Einbruch und Speicherprobleme |
-| **Sample-Anzahl** | **Praktisch ≤ 10.000** Trainings-/Kontext-Samples — Attention skaliert quadratisch in N |
-| **Label** | **Benötigt** — In-Context-Lernen ist supervised (für reine Embedding-Extraktion reichen Dummy-Labels, üblich `y=0` für alle Inlier) |
-| **Format** | NumPy-Array oder PyTorch-Tensor (`X_train`, `y_train`, `X_test`) |
+| **Task** | classification / regression (in-context); embedding via `get_embeddings()` |
+| **Data type** | numeric; categorical features as integer codes |
+| **Text** | not supported — free texts must be embedded beforehand (e.g. Sentence-Transformer + PCA) |
+| **Missing values** | partially tolerated, but not robust |
+| **# Features** | **practically ≤ 500** — architectural soft limit; higher dimensions cause performance drops and memory issues |
+| **# Samples** | **practically ≤ 10,000** — attention scales quadratically in N |
+| **Label** | **required** — in-context learning is supervised (dummy labels suffice for pure embedding extraction, typically `y=0` for all inliers) |
+| **Format** | NumPy array or PyTorch tensor (`X_train`, `y_train`, `X_test`) |
 
-**Kernproblem:** TabPFN ist kein OD-Modell, sondern ein Klassifikator. Für Outlier Detection wird ausschließlich der Embedding-Pfad genutzt — die Embeddings selbst sind erst dann brauchbar, wenn ausreichend Inlier-Kontext (≥ einige Hundert Samples) übergeben wird. Hochdimensionale Eingaben (z. B. ST-Embeddings 1.500 + d) müssen vorher per PCA reduziert werden.
+**Core issue:** TabPFN is a classifier, not an OD model. For outlier detection only the embedding path is used, and the embeddings are useful only with enough inlier context (≥ a few hundred samples). High-dimensional inputs (e.g. ST embeddings 1,500+ d) must be PCA-reduced first.
 
 ---
 
-## 2. TabPFN-Unsupervised (Native OD)
+## 2. TabPFN-Unsupervised (native OD)
 
-Verwendung im Projekt: **direkter OD-Detektor** — destillierte TabPFN-Variante über `tabpfn_extensions.unsupervised.TabPFNUnsupervisedModel` + `OutlierDetectionUnsupervisedExperiment`. Liefert direkt Outlier-Scores ohne Labels.
+Used as a **direct OD detector** — distilled TabPFN variant via `tabpfn_extensions.unsupervised.TabPFNUnsupervisedModel` + `OutlierDetectionUnsupervisedExperiment`. Returns outlier scores directly, no labels.
 
-| Anforderung | Detail |
+| Requirement | Detail |
 |---|---|
-| **Aufgabe** | Outlier Detection (unüberwacht) |
-| **Datentyp** | Numerisch; kategorische Features als Integer-Codes |
-| **Text** | Nicht unterstützt — gleiche Restriktion wie TabPFN |
-| **Kategorisch** | Über Integer-Codes; explizite Kennzeichnung möglich |
-| **Fehlende Werte** | Werden teilweise toleriert, jedoch nicht robust |
-| **Feature-Anzahl** | **Praktisch ≤ 50** — kein hartes Limit, aber starke Degradation oberhalb (Attention über Feature-Dimension); bei > 100 selten sinnvoll |
-| **Sample-Anzahl** | **Praktisch ≤ 3.000** — Inferenz quadratisch in N, oberhalb stark eingeschränkte Praktikabilität |
-| **Label** | **Nicht benötigt** (vollständig unüberwacht) |
-| **Format** | NumPy-Array / PyTorch-Tensor; intern werden Klassifikator + Regressor zu einem Density-Modell kombiniert |
+| **Task** | outlier detection (unsupervised) |
+| **Data type** | numeric; categorical features as integer codes |
+| **Text** | not supported — same restriction as TabPFN |
+| **Missing values** | partially tolerated, but not robust |
+| **# Features** | **practically ≤ 50** — no hard limit, but strong degradation above (attention over the feature dimension); rarely useful > 100 |
+| **# Samples** | **practically ≤ 3,000** — inference quadratic in N |
+| **Label** | **not required** (fully unsupervised) |
+| **Format** | NumPy array / PyTorch tensor; internally combines classifier + regressor into a density model |
 
-**Kernproblem:** Die doppelte Einschränkung auf Features (~50) und Samples (~3.000) macht das Modell für große, hochdimensionale Datensätze nur mit erheblicher Vorverarbeitung (PCA, Subsampling) einsetzbar — und Ergebnisse gelten dann nur für das Subsample.
+**Core issue:** the double limit on features (~50) and samples (~3,000) makes the model usable on large, high-dimensional datasets only with substantial preprocessing (PCA, subsampling) — and results then hold only for the subsample.
 
 ---
 
 ## 3. ConTextTab (SAP-rpt-1-oss)
 
-Verwendung im Projekt: **nativer Klassifikator über tabellarische Daten inkl. Freitext** — eingesetzt in Experiment 2 für SHAP-Analyse der Feature-Importance.
+Used as a **native classifier over tabular data incl. free text** — applied in Experiment 3 for SHAP feature-importance analysis.
 
-| Anforderung | Detail |
+| Requirement | Detail |
 |---|---|
-| **Aufgabe** | Klassifikation / Regression (in-context, transduktiv) |
-| **Datentyp** | **Alle Typen nativ** — Zahlen, Text, Kategorien, Datum |
-| **Text** | Nativ unterstützt — wird intern via Sentence-Transformer (`all-MiniLM-L6-v2`) eingebettet |
-| **Kategorisch** | Nativ unterstützt — wird als Text-Zellwert eingebettet |
-| **Numerisch** | Nativ unterstützt — quantil-basierte Einbettung (64 Quantil-Levels) |
-| **Datum** | Nativ unterstützt — Jahr, Monat, Tag, Wochentag separat |
-| **Fehlende Werte** | Werden intern als eigener Zustand behandelt — kein Imputieren nötig |
-| **Feature-Anzahl** | **Max. 500 Spalten (hart)** — bei mehr wird zufällig subsampelt |
-| **Sample-Anzahl (Kontext)** | **Max. 8.192 Kontext-Samples pro Inferenz-Aufruf** — darüber Subsampling |
-| **Label** | **Benötigt** (auch für OD ein Dummy-Label nötig — z. B. alle Inlier mit `y=0`) |
-| **Kontext-Anforderung** | Rein **transduktiv** — jede Query-Zeile wird relativ zu einem übergebenen Inlier-Kontext eingebettet, kein eigenständiges Embedding möglich |
-| **Format** | Pandas-DataFrame mit originalen Spaltentypen (str, float, int, datetime) |
+| **Task** | classification / regression (in-context, transductive) |
+| **Data type** | **all types native** — numbers, text, categories, dates |
+| **Text** | native — embedded internally via Sentence-Transformer (`all-MiniLM-L6-v2`) |
+| **Categorical** | native — embedded as text cell value |
+| **Numeric** | native — quantile-based embedding (64 quantile levels) |
+| **Date** | native — year, month, day, weekday separately |
+| **Missing values** | handled internally as their own state — no imputation needed |
+| **# Features** | **max. 500 columns (hard)** — random subsampling above |
+| **# Samples (context)** | **max. 8,192 context samples per inference call** — subsampling above |
+| **Label** | **required** (a dummy label is needed even for OD — e.g. all inliers `y=0`) |
+| **Context** | purely **transductive** — each query row is embedded relative to a given inlier context; no standalone embedding |
+| **Format** | pandas DataFrame with original column types (str, float, int, datetime) |
 
-**Kernproblem:** Das Modell ist inhärent **kontextabhängig** — ein Embedding einer Zeile ist nicht absolut, sondern stets relativ zum übergebenen Kontext. Ohne Referenz-Kontext (Inlier-Set) sind keine sinnvollen Repräsentationen berechenbar. Außerdem erfordert die Architektur nominell ein Ziel-Label, auch wenn es im OD-Setting nur ein Dummy ist.
+**Core issue:** the model is inherently **context-dependent** — a row's embedding is not absolute but always relative to the given context. Without a reference context (inlier set) no meaningful representations exist. The architecture also nominally requires a target label, even if it is only a dummy in the OD setting.
 
 ---
 
 ## 4. AnoLLM (Qwen2.5-0.5B + LoRA)
 
-Verwendung im Projekt: **semi-supervised OD** — LoRA-Fine-Tuning eines kleinen Sprachmodells auf Inlier-Zeilen; Outlier-Score = negative Log-Likelihood (NLL) der serialisierten Zeile.
+Used for **semi-supervised OD** — LoRA fine-tuning of a small language model on inlier rows; outlier score = negative log-likelihood (NLL) of the serialized row.
 
-| Anforderung | Detail |
+| Requirement | Detail |
 |---|---|
-| **Aufgabe** | Sprachmodell-basierte Dichte-Schätzung → OD-Score über NLL |
-| **Datentyp** | Alle Typen — wird in **Text serialisiert** (`"col is val, col is val, …"`) |
-| **Text** | Nativ unterstützt — direkt in die Serialisierung übernommen |
-| **Kategorisch** | Nativ unterstützt — als String-Wert |
-| **Numerisch** | Als String serialisiert (`"salary is 50000"`) — keine mathematische Verarbeitung, Zahlen werden tokenisiert |
-| **Fehlende Werte** | Werden als leerer String / `"unknown"` serialisiert — Modell lernt das Muster |
-| **Feature-Anzahl** | Kein strukturelles Limit; jede Spalte belegt aber Token-Budget |
-| **Sample-Anzahl (Inferenz)** | Unbegrenzt; Training ausschließlich auf Inlier-Zeilen |
-| **Token-Limit** | **Hart: Kontextfenster des Basismodells** (Qwen2.5-0.5B → 32k nominal, im Setup typischerweise auf wenige Hundert Tokens/Zeile begrenzt) — lange Textspalten müssen gekürzt werden |
-| **Label** | Training auf Inlier-only (`y=0`); Labels werden nicht als Input übergeben, nur zur Filterung des Train-Sets |
-| **Format** | Jede Zeile als ein Freitext-String (Serialisierung), batchweise tokenisiert |
+| **Task** | language-model density estimation → OD score via NLL |
+| **Data type** | all types — **serialized to text** (`"col is val, col is val, …"`) |
+| **Text** | native — taken directly into the serialization |
+| **Categorical** | native — as string value |
+| **Numeric** | serialized as string (`"salary is 50000"`) — no mathematical processing, numbers are tokenized |
+| **Missing values** | serialized as empty string / `"unknown"` — the model learns the pattern |
+| **# Features** | no structural limit, but each column consumes token budget |
+| **# Samples (inference)** | unlimited; training only on inlier rows |
+| **Token limit** | **hard: base model context window** (Qwen2.5-0.5B → 32k nominal, typically capped at a few hundred tokens/row) — long text columns must be truncated |
+| **Label** | training on inliers only (`y=0`); labels are not passed as input, only used to filter the train set |
+| **Format** | each row as one free-text string (serialization), tokenized in batches |
 
-**Kernproblem:** Numerische Relationen (z. B. `salary > 100.000`) werden nicht als Zahlen verstanden, sondern als Token-Sequenzen. Bei Datensätzen mit vielen langen Textspalten (z. B. Fake Job Postings) muss aggressiv gekürzt werden, was Informationsverlust bedeuten kann. Außerdem ist die NLL pro Zeile nicht direkt vergleichbar zwischen Datensätzen — kalibriert wird relativ zum Inlier-Score.
+**Core issue:** numeric relations (e.g. `salary > 100,000`) are not understood as numbers but as token sequences. Datasets with many long text columns (e.g. Fake Job Postings) require aggressive truncation and hence information loss. The per-row NLL is also not directly comparable across datasets — it is calibrated relative to the inlier score.
 
 ---
 
-## 5. FoMo-OD
+## 5. FoMo-0D
 
-Verwendung im Projekt: **Zero-Shot OD** — vortrainiertes PFN-Modell wird ohne weiteres Training auf neue Datensätze angewendet.
+Used for **zero-shot OD** — a pretrained PFN model applied to new datasets without further training.
 
-| Anforderung | Detail |
+| Requirement | Detail |
 |---|---|
-| **Aufgabe** | Zero-Shot Outlier Detection |
-| **Datentyp** | Ausschließlich numerisch (float) |
-| **Text** | Nicht unterstützt |
-| **Kategorisch** | Nicht unterstützt — muss vorab kodiert werden (OHE / Frequency-Encoding) |
-| **Fehlende Werte** | Nicht erlaubt — müssen imputiert werden |
-| **Feature-Anzahl** | **Exakt 100 (hart)** — Architektur-Constraint; weniger Features → Padding mit Nullen, mehr Features → Subsampling / Reduktion auf 100 |
-| **Sample-Anzahl (Kontext)** | Kein hartes Limit; Inferenz-Kontext typischerweise ≤ 5.000 Samples |
-| **Label** | Nicht benötigt; Kontext sollte aus Inlier-Samples bestehen (semi-supervised Annahme) |
-| **Format** | Numerische Matrix (N × 100), `float32` |
+| **Task** | zero-shot outlier detection |
+| **Data type** | numeric (float) only |
+| **Text** | not supported |
+| **Categorical** | not supported — must be encoded beforehand (OHE / frequency encoding) |
+| **Missing values** | not allowed — must be imputed |
+| **# Features** | **exactly 100 (hard)** — architectural constraint; fewer features → zero-padding, more features → subsampling/reduction to 100 |
+| **# Samples (context)** | no hard limit; inference context typically ≤ 5,000 samples |
+| **Label** | not required; context should consist of inlier samples (semi-supervised assumption) |
+| **Format** | numeric matrix (N × 100), `float32` |
 
-**Kernproblem:** Die feste Eingabedimension von **genau 100 Features** ist das stärkste Constraint im Projekt. Datensätze müssen immer auf diese Zahl gebracht werden — entweder per Padding (bei wenigen Features wie Fake Jobs mit 13 Features) oder per Reduktion (bei vielen Features wie ST-Embedding-Pipelines mit 1.920 d). Die Wahl der Reduktionsmethode (PCA vs. Feature-Selection vs. Subsampling) hat starken Einfluss auf die Performance.
+**Core issue:** the fixed input of **exactly 100 features** is the strongest constraint in the project. Datasets must always be brought to this number — via padding (few features, e.g. Fake Jobs with 13) or reduction (many features, e.g. ST-embedding pipelines with 1,920 d). The choice of reduction method (PCA vs. feature selection vs. subsampling) strongly affects performance.
 
 ---
 
-## 📊 Constraints auf einen Blick
+## Constraints at a glance
 
-| Modell | Numerisch | Text | Kategorisch | NaN | Max. Features | Max. Samples | Label nötig |
+| Model | Numeric | Text | Categorical | NaN | Max features | Max samples | Label |
 |---|---|---|---|---|---|---|---|
-| **TabPFN 2.5 (Embed)** | ✅ nativ | ❌ | ⚠️ als Int | ⚠️ | ~500 (praktisch) | ~10.000 | ✅ (Dummy-Label reicht) |
-| **TabPFN-Unsupervised** | ✅ nativ | ❌ | ⚠️ als Int | ⚠️ | **~50 (praktisch)** | **~3.000 (praktisch)** | ❌ |
-| **ConTextTab** | ✅ nativ | ✅ nativ | ✅ nativ | ✅ nativ | **≤ 500 (hart)** | ≤ 8.192/Aufruf | ⚠️ Dummy |
-| **AnoLLM** | ⚠️ als Token | ✅ nativ | ✅ als Token | ✅ als Token | ⚠️ Token-Budget | unbegrenzt | ❌ (Inlier-only Training) |
-| **FoMo-OD** | ✅ nativ | ❌ | ❌ | ❌ | **= 100 (hart)** | ~5.000 | ❌ |
+| **TabPFN 2.5 (embed)** | ✅ native | ❌ | ⚠️ as int | ⚠️ | ~500 (practical) | ~10,000 | ✅ (dummy ok) |
+| **TabPFN-Unsupervised** | ✅ native | ❌ | ⚠️ as int | ⚠️ | **~50 (practical)** | **~3,000 (practical)** | ❌ |
+| **ConTextTab** | ✅ native | ✅ native | ✅ native | ✅ native | **≤ 500 (hard)** | ≤ 8,192/call | ⚠️ dummy |
+| **AnoLLM** | ⚠️ as token | ✅ native | ✅ as token | ✅ as token | ⚠️ token budget | unlimited | ❌ (inlier-only) |
+| **FoMo-0D** | ✅ native | ❌ | ❌ | ❌ | **= 100 (hard)** | ~5,000 | ❌ |
 
-**Legende:** ✅ = nativ unterstützt | ⚠️ = mit Einschränkung | ❌ = nicht unterstützt
+**Legend:** ✅ native · ⚠️ with limitations · ❌ not supported
 
 ---
 
-## Implikationen für die Pipeline-Wahl
+## Implications for pipeline choice
 
-| Datenlage | Geeignete TFMs |
+| Data situation | Suitable TFMs |
 |---|---|
-| Wenige Features (≤ 50), keine Texte | TabPFN-Unsupervised, FoMo-OD (mit Padding auf 100) |
-| Viele Features (>> 100), keine Texte | TabPFN 2.5 (Embed-Pfad nach PCA), FoMo-OD nach PCA(100) |
-| Texte zentral wichtig | AnoLLM (semi-supervised), ConTextTab (für SHAP / Klassifikation) |
-| Heterogene Mischung (num + text + cat + NaN) | ConTextTab (nativ), AnoLLM (über Serialisierung) |
-| Pure Zero-Shot ohne Training | FoMo-OD, TabPFN-Unsupervised |
+| Few features (≤ 50), no text | TabPFN-Unsupervised, FoMo-0D (padded to 100) |
+| Many features (>> 100), no text | TabPFN 2.5 (embed path after PCA), FoMo-0D after PCA(100) |
+| Text is central | AnoLLM (semi-supervised), ConTextTab (for SHAP / classification) |
+| Heterogeneous mix (num + text + cat + NaN) | ConTextTab (native), AnoLLM (via serialization) |
+| Pure zero-shot, no training | FoMo-0D, TabPFN-Unsupervised |

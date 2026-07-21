@@ -1,183 +1,158 @@
-# Datensätze
+# Datasets & preprocessing
 
-Zwei Datensätze für die Outlier-Detection-Experimente — beide mit Mischung aus strukturierten und Freitext-Spalten.
+Two datasets for the outlier-detection experiments — both a mix of structured and free-text columns. Sections 1–2 describe the raw data and the dataset-specific cleaning; [section 3](#3-preprocessing-variants) describes the preprocessing variants built on top of it.
 
-| Datensatz | Aufgabe | Outlier-Definition | Outlier-Rate | Freitextspalten |
+| Dataset | Task | Outlier definition | Outlier rate | Free-text cols |
 |---|---|---|---|---|
-| **Fake Job Postings** | Fraud Detection auf Stellenanzeigen | natürlich (`fraudulent = 1`) | 4,84 % | 5 |
-| **Airbnb Listings (Paris)** | Erkennung schlecht bewerteter Listings | konstruiert (`is_top_rating = 0`) | 3,93 % | 4 |
+| **Fake Job Postings** | fraud detection on job ads | natural (`fraudulent = 1`) | 4.84 % | 5 |
+| **Airbnb Listings (Paris)** | detecting poorly rated listings | constructed (`is_top_rating = 0`) | 3.93 % | 4 |
 
 ---
 
 ## 1. Fake Job Postings
 
-Quelle: Kaggle — *Real or Fake – Fake Job Posting Prediction*. Jede Zeile ist eine Stellenanzeige; das Label `fraudulent` markiert Fake-Jobs.
+Source: Kaggle — *Real or Fake – Fake Job Posting Prediction*. Each row is a job ad; the label `fraudulent` marks fake jobs.
 
-### Kenngrößen
+### Key figures
 
-| Kenngröße | Wert |
+| Metric | Value |
 |---|---|
-| Gesamteinträge | 17.880 |
-| Spalten roh | 18 (16 Features + `job_id` + `fraudulent`) |
-| Outlier (`fraudulent = 1`) | 866 |
-| Outlier-Rate | **4,84 %** |
-| Datei (roh) | `data/raw/fake_job_postings.csv` |
+| Total entries | 17,880 |
+| Raw columns | 18 (16 features + `job_id` + `fraudulent`) |
+| Outliers (`fraudulent = 1`) | 866 |
+| Outlier rate | **4.84 %** |
+| Raw file | `data/raw/fake_job_postings.csv` |
 
-### Spaltenübersicht
+### Columns
 
-| Typ | Spalten |
+| Type | Columns |
 |---|---|
 | ID | `job_id` |
-| Binär | `telecommuting`, `has_company_logo`, `has_questions` |
-| Kategorisch | `employment_type`, `required_experience`, `required_education`, `industry`, `function`, `department` |
-| Strukturiert (Substring) | `location` (`"Country, State, City"`), `salary_range` (`"min-max"`) |
-| **Freitext** | `title`, `company_profile`, `description`, `requirements`, `benefits` |
-| Label | `fraudulent` (0 = echt, 1 = Fake) |
+| Binary | `telecommuting`, `has_company_logo`, `has_questions` |
+| Categorical | `employment_type`, `required_experience`, `required_education`, `industry`, `function`, `department` |
+| Structured (substring) | `location` (`"Country, State, City"`), `salary_range` (`"min-max"`) |
+| **Free text** | `title`, `company_profile`, `description`, `requirements`, `benefits` |
+| Label | `fraudulent` (0 = real, 1 = fake) |
 
-### Fehlende Werte (roh)
+Several columns have a high share of missing values (up to 84 % for `salary_range`). Handling by type during preprocessing: categorical → `"missing"`, text → `""`, numeric → median.
 
-Hoher Missing-Anteil in mehreren Spalten — im Preprocessing je nach Typ behandelt (kategorisch → `"missing"`, Text → `""`, numerisch → Median).
+### Feature engineering
 
-| Spalte | Missing | Anteil |
-|---|---|---|
-| `salary_range` | 15.012 | 84,0 % |
-| `department` | 11.547 | 64,6 % |
-| `required_education` | 8.105 | 45,3 % |
-| `benefits` | 7.212 | 40,3 % |
-| `required_experience` | 7.050 | 39,4 % |
-| `function` | 6.455 | 36,1 % |
-| `industry` | 4.903 | 27,4 % |
-| `employment_type` | 3.471 | 19,4 % |
-| `company_profile` | 3.308 | 18,5 % |
-| `requirements` | 2.696 | 15,1 % |
-| `location` | 346 | 1,9 % |
-| `description` | 1 | < 0,1 % |
+The cleaned pipeline (`fake_job_notebooks/preprocessing/cleaned.ipynb`):
 
-### OD-Label
+1. **Split `location`** → `country`, `state`, `city`.
+2. **Parse `salary_range`** → `salary_avg` (range mean, median-imputed).
+3. Keep **`job_id`** as `row_id` (join key); extract the label `fraudulent`.
+4. Frequency-encode all categories; StandardScaler on numeric columns.
 
-Natürlich vorhanden: `fraudulent ∈ {0, 1}`. Keine Konstruktion nötig.
-
-### Feature Engineering
-
-Die Cleaned-Pipeline (`fake_job_notebooks/preprocessing/cleaned.ipynb`) leitet ab:
-
-1. **`location` aufsplitten** → `country`, `state`, `city`.
-2. **`salary_range` parsen** → `salary_avg` (Mittel der Range, Median-imputiert).
-3. **`job_id`** als `row_id` (Join-Key) behalten; Label `fraudulent` extrahiert.
-4. Alle Kategorien **frequency-encoded**, numerische Spalten StandardScaler-skaliert.
-
-### Pipelines
-
-| Pipeline | Notebook | Ergebnis | Datei |
-|---|---|---|---|
-| **Cleaned** | `preprocessing/cleaned.ipynb` | 13 numerische Features (Text entfernt) + `row_id` | `cleaned_fake_jobs.csv` |
-| **Cleaned + Freitexte** | `preprocessing/cleaned_text.ipynb` | Cleaned + 5 Rohtexte | `cleaned_text_fake_jobs.csv` |
-| **Semantisch / Enhanced** | `preprocessing/{semantic,enhanced}*.ipynb` | Sentence-Transformer- bzw. TabPFN-Embeddings | `{semantic,enhanced}*_fake_jobs.csv` |
-| **FastText** | `preprocessing/fast_text.ipynb` | Cleaned + fastText-Text-Embeddings (PCA 30/100) | `fast_text_pca{30,100}_fake_jobs.csv` |
+`cleaned` yields **13 numeric features** + `row_id` + label. The variants built on top of it are described in [section 3](#3-preprocessing-variants).
 
 ---
 
 ## 2. Airbnb Listings (Paris)
 
-Quelle: **Inside Airbnb** (`listings.csv`, Scrape **September 2025**, `last_scraped` 2025-09-12 bis 2025-09-15). Property-, Host- und Review-Metadaten von Kurzzeit-Vermietungen für **Paris**. Inside-Airbnb liefert kein OD-Label — der Outlier-Status wird über die Bewertung konstruiert.
+Source: **Inside Airbnb** (`listings.csv`, scrape **September 2025**). Property, host, and review metadata for short-term rentals in **Paris**. Inside Airbnb provides no outlier label — outlier status is constructed from the rating.
 
-> ⚠️ **Datenstand:** Es handelt sich um einen aktuellen Scrape (Sep. 2025), nicht um die ältere v4.3 (Aug. 2022). Das Schema enthält neuere Spalten (`source`, `estimated_occupancy_l365d`, `estimated_revenue_l365d`, `availability_eoy`, `number_of_reviews_ly`).
+> **Data version:** this is a recent scrape (Sep 2025), not the older v4.3 (Aug 2022). The schema contains newer columns (`source`, `estimated_occupancy_l365d`, `estimated_revenue_l365d`, `availability_eoy`, `number_of_reviews_ly`), and several columns are **100 % empty** in this version (see below).
 
-### Kenngrößen
+### Key figures
 
-| Kenngröße | Wert |
+| Metric | Value |
 |---|---|
-| Roh-Einträge | 81.853 |
-| Nach Cleaning | 18.350 |
-| Spalten roh | 79 |
-| Spalten nach Cleaning | **45** (40 Features + 4 Freitext + 1 Label) |
-| Features (40) | 27 numerisch/binär · 2 freq-encoded · 9 OHE (5 `host_response_time` + 4 `room_type`) |
-| Outlier (`is_top_rating = 0`) | 721 |
-| Outlier-Rate | **3,93 %** |
-| Datei (roh) | `data/raw/airbnb_paris.csv` |
-| Datei (cleaned) | `data/preprocessed/cleaned_airbnb_paris.csv` |
+| Raw entries | 81,853 |
+| After cleaning | 18,350 |
+| Raw columns | 79 |
+| Outliers (`is_top_rating = 0`) | 721 |
+| Outlier rate | **3.93 %** |
+| Raw file | `data/raw/airbnb_paris.csv` |
+| Cleaned file | `data/preprocessed/cleaned_airbnb_paris.csv` |
 
-> Hinweis: `Features (40)` / `Spalten nach Cleaning 45` stammen aus der älteren Datenversion und müssen für den Sep-2025-Scrape neu bestimmt werden — siehe **Vollständig leere Spalten** unten.
+### Fully empty columns (Sep-2025 scrape)
 
-### Vollständig leere Spalten (Sep-2025-Scrape)
+These columns are 100 % empty and drive part of the feature engineering:
 
-In dieser Datenversion sind mehrere Spalten zu **100 % leer** und damit unbrauchbar — das betrifft direkt das Feature Engineering:
-
-| Spalte | Status | Konsequenz |
-|---|---|---|
-| `price` | komplett leer | **Kein** Preis-Feature möglich (Feature-Engineering-Schritt „price parsen" entfällt) |
-| `beds` | komplett leer | droppen; ggf. durch `accommodates` ersetzen |
-| `bathrooms` | komplett leer | aus `bathrooms_text` (`"1 bath"`, `"1.5 baths"`, `"shared bath"`) parsen |
-| `neighbourhood_group_cleansed` | komplett leer | droppen |
-| `calendar_updated` | komplett leer | droppen |
-| `estimated_revenue_l365d` | komplett leer | droppen |
-
-### Spaltenübersicht
-
-| Typ | Spalten (Auswahl) |
+| Column | Consequence |
 |---|---|
-| ID / Metadaten | `id`, `host_id`, `listing_url`, `scrape_id`, `last_scraped` *(im Cleaning entfernt)* |
-| Property | `property_type` (61 Werte, freq-enc), `room_type` (4 Werte, OHE), `accommodates`, `bedrooms` (81 % gefüllt); `beds`/`bathrooms` leer → `bathrooms` aus `bathrooms_text` |
+| `price` | no price feature possible (the "parse price" step is dropped) |
+| `beds` | drop; optionally replace with `accommodates` |
+| `bathrooms` | parse from `bathrooms_text` (`"1 bath"`, `"1.5 baths"`, `"shared bath"`) |
+| `neighbourhood_group_cleansed`, `calendar_updated`, `estimated_revenue_l365d` | drop |
+
+### Columns (selection)
+
+| Type | Columns |
+|---|---|
+| ID / metadata | `id`, `host_id`, `listing_url`, `scrape_id`, `last_scraped` *(removed in cleaning)* |
+| Property | `property_type` (61 values, freq-enc), `room_type` (4 values, OHE), `accommodates`, `bedrooms`; `bathrooms` from `bathrooms_text` |
 | Host | `host_since`, `host_response_rate`, `host_acceptance_rate`, `host_is_superhost`, `host_identity_verified`, `host_verifications`, `host_location` |
-| Geo | `latitude`, `longitude`, `neighbourhood_cleansed` (Arrondissements, freq-encoded) |
-| Booking / Pricing | `price`, `minimum_nights`, `maximum_nights`, `instant_bookable` |
-| Verfügbarkeit | `availability_30/60/90/365` |
-| Reviews | `number_of_reviews`, `review_scores_rating` *(Quelle für Label, danach gedroppt)* |
-| **Freitext** | `name`, `description`, `neighborhood_overview`, `host_about` |
-| Label (konstruiert) | `is_top_rating` (0 = Outlier, 1 = Inlier) |
+| Geo | `latitude`, `longitude`, `neighbourhood_cleansed` (arrondissements, freq-encoded) |
+| Booking | `minimum_nights`, `maximum_nights`, `instant_bookable`, `availability_30/60/90/365` |
+| Reviews | `number_of_reviews`, `review_scores_rating` *(label source, then dropped)* |
+| **Free text** | `name`, `description`, `neighborhood_overview`, `host_about` |
+| Label (constructed) | `is_top_rating` (0 = outlier, 1 = inlier) |
 
-### Fehlende Werte (roh)
+Missing-value handling in cleaning: numeric → median, categorical → `"unknown"`, boolean → mode, free texts → kept as NaN / empty string and filled only at embedding time. Free-text fill rates: `name` (100 %), `description` (96.7 %), `neighborhood_overview` (48.4 %), `host_about` (44.6 %).
 
-Behandlung im Cleaning: numerisch → Median, kategorisch → `"unknown"`, Boolean → Mode, Freitexte → bleiben als NaN bzw. leerer String und werden erst beim Embedding gefüllt.
+### Label construction from the rating
 
-| Spalte | Missing | Anteil |
-|---|---|---|
-| `beds`, `bathrooms`, `price`, `calendar_updated`, `neighbourhood_group_cleansed`, `estimated_revenue_l365d` | 81.853 | 100,0 % |
-| `host_neighbourhood` | 53.832 | 65,8 % |
-| `host_about` | 45.350 | 55,4 % |
-| `neighbourhood`, `neighborhood_overview` | 42.253 | 51,6 % |
-| `host_response_time`, `host_response_rate` | ~32.200 | 39,3 % |
-| `host_acceptance_rate` | 26.107 | 31,9 % |
-| `review_scores_*` | ~18.000 | 22,0 % |
-| `review_scores_rating` (Label-Quelle) | 17.960 | 21,9 % |
-| `reviews_per_month` | 17.960 | 22,0 % |
-| `bedrooms` | 15.427 | 18,9 % |
-| `description` | 2.713 | 3,3 % |
-| `bathrooms_text` | 67 | < 0,1 % |
-| `name` | 0 | 0,0 % |
+In `airbnb_notebooks/preprocessing/cleaned.ipynb`:
 
-**Freitextspalten:** `name` (0 %), `description` (3,3 %), `neighborhood_overview` (51,6 %), `host_about` (55,4 %).
+1. **Inlier (`is_top_rating = 1`):** `review_scores_rating == 5.0` (top rating).
+2. **Outlier (`is_top_rating = 0`):** `review_scores_rating <= 3.0` (clearly weak rating).
+3. The **mid-range** (`3 < rating < 5`) is discarded so the classes are cleanly separable.
+4. Listings without a rating are removed.
+5. All granular `review_scores_*` columns are dropped to avoid label leakage.
 
-### OD-Label — Konstruktion via Bewertung
-
-Konstruktion in `airbnb_notebooks/preprocessing/cleaned.ipynb`:
-
-1. **Inlier (`is_top_rating = 1`):** `review_scores_rating == 5.0` (Top-Bewertung).
-2. **Outlier (`is_top_rating = 0`):** `review_scores_rating <= 3.0` (klar schwache Bewertung).
-3. **Mittelfeld** (`3 < rating < 5`) wird verworfen, damit die Klassen sauber trennbar sind.
-4. Listings ohne Rating werden ebenfalls entfernt.
-5. Alle granularen `review_scores_*`-Spalten werden gedroppt, um Label-Leak auszuschließen.
-
-### Feature Engineering
+### Feature engineering
 
 `airbnb_notebooks/preprocessing/cleaned.ipynb`:
 
-1. **`host_since`** → `host_tenure_days` (Tage seit Registrierung).
-2. **`host_response_rate`, `host_acceptance_rate`** → `%` entfernen, in Float (`price` entfällt, da leer).
-3. **`bathrooms`** → aus `bathrooms_text` parsen (Zahl extrahieren; `"shared/half bath"` → 0,5).
-5. **`amenities`, `host_verifications`** → Listenlängen als Counts.
-6. **`host_location`** → Flags `host_in_paris`, `host_in_france`, `host_location_missing`; Rohspalte gedroppt.
-7. **Boolean (`t`/`f`)** → 0/1.
-8. **OHE** für niedrige Kardinalität: `host_response_time` (5 Spalten inkl. `unknown`), `room_type` (4 Spalten).
-9. **Frequency-Encoding** für hohe Kardinalität: `neighbourhood_cleansed` (20 Arrondissements), `property_type` (61 Werte).
-10. **`StandardScaler`** auf alle numerischen / frequency-encoded Spalten (Boolean, OHE, Label, Freitexte ausgenommen).
-11. Spaltennamen in `snake_case` normalisiert (Umlaute transliteriert).
+1. **`host_since`** → `host_tenure_days` (days since registration).
+2. **`host_response_rate`, `host_acceptance_rate`** → strip `%`, cast to float.
+3. **`bathrooms`** → parse from `bathrooms_text` (`"shared/half bath"` → 0.5).
+4. **`amenities`, `host_verifications`** → list lengths as counts.
+5. **`host_location`** → flags `host_in_paris`, `host_in_france`, `host_location_missing`; raw column dropped.
+6. **Boolean (`t`/`f`)** → 0/1.
+7. **OHE** for low cardinality: `host_response_time` (5 columns incl. `unknown`), `room_type` (4 columns).
+8. **Frequency encoding** for high cardinality: `neighbourhood_cleansed` (20 arrondissements), `property_type` (61 values).
+9. **StandardScaler** on all numeric / frequency-encoded columns (boolean, OHE, label, free texts excluded).
+10. Column names normalized to `snake_case` (ASCII, lowercase).
 
-### Pipelines
+The variants built on top of `cleaned` are described in the next section.
 
-| Pipeline | Notebook | Ergebnis | Datei |
-|---|---|---|---|
-| **Cleaned** | `preprocessing/cleaned.ipynb` | numerische Features (Text entfernt) + `row_id` | `cleaned_airbnb_paris.csv` |
-| **Cleaned + Freitexte** | `preprocessing/cleaned_text.ipynb` | Cleaned + 4 Rohtexte | `cleaned_text_airbnb_paris.csv` |
-| **Semantisch / Enhanced** | `preprocessing/{semantic,enhanced}*.ipynb` | Sentence-Transformer- bzw. TabPFN-Embeddings | `{semantic,enhanced}*_airbnb_paris.csv` |
-| **FastText** | `preprocessing/fast_text.ipynb` | Cleaned + fastText-Text-Embeddings (PCA 30/100) | `fast_text_pca{30,100}_airbnb_paris.csv` |
+---
+
+## 3. Preprocessing variants
+
+Nine variants are stored as CSV under `data/preprocessed/<variant>_<dataset>.csv`; the notebooks live in `<dataset>_notebooks/preprocessing/`. The tenth (`enhanced_semantic_pca30`) is assembled on the fly in the `exp2` notebook. The label logic is identical across all variants, and every file keeps `row_id` as the join key.
+
+| Variant | Notebook | Content |
+|---|---|---|
+| `cleaned` | `cleaned.ipynb` | numeric/encoded features only (free text removed) |
+| `cleaned_text` | `cleaned_text.ipynb` | `cleaned` + the original free-text columns |
+| `semantic` | `semantic.ipynb` | `cleaned` + Sentence-Transformer text embeddings (high-dimensional) |
+| `semantic_pca100` / `semantic_pca30` | `semantic_pca*.ipynb` | `semantic` with the text block reduced to 100 / 30 PCA components |
+| `fast_text_pca100` / `fast_text_pca30` | `fast_text.ipynb` | `cleaned` + fastText text embeddings, PCA 100 / 30 |
+| `enhanced` | `enhanced.ipynb` | TabPFN embeddings only (~192-dim), no raw features |
+| `enhanced_pca30` | `enhanced_pca30.ipynb` | `enhanced` reduced to 30 PCA components |
+| `enhanced_semantic_pca30` | — (built in `exp2`) | join of `enhanced_pca30` + `semantic_pca30` |
+
+### cleaned
+Purely numeric table: free-text and leakage columns removed, categoricals frequency-/one-hot-encoded, numeric median-imputed and **StandardScaler**-normalized. Since the two datasets differ in content, `cleaned` is implemented **per dataset** — see the feature-engineering sections above ([Fake Jobs](#feature-engineering), [Airbnb Paris](#feature-engineering-1)).
+
+### cleaned_text
+`cleaned` **+** the original free-text columns (joined via `row_id`) — 5 texts for Fake Jobs, 4 for Airbnb. Input format for the models that process text natively (AnoLLM, ConTextTab).
+
+### semantic / semantic_pca100 / semantic_pca30
+Each **free-text cell** is embedded with a Sentence-Transformer (`all-mpnet-base-v2`), with the column-name embedding added on top; the free-text columns are replaced by their embedding vectors. `semantic` keeps the full block (1,500+ dimensions), the `_pca*` variants reduce it to **100** or **30** components — PCA 30 still retains > 80 % explained variance.
+
+### fast_text_pca100 / fast_text_pca30
+Same pipeline as `semantic`, but the cells are embedded with unsupervised **fastText** (skipgram, 100d per column, column-name embedding added, per-vector LayerNorm) and then PCA-reduced to **30** or **100** components. Serves as the non-Transformer alternative for the free-text representation.
+
+### enhanced / enhanced_pca30
+`cleaned` (text removed) → **TabPFN** is fit on the label, and `get_embeddings` yields a ~192-dim representation per row, which *replaces* the raw features. `enhanced_pca30` reduces this to 30 components (> 80 % explained variance).
+
+> **Leakage:** the TabPFN embeddings are trained on the label, so these two variants carry label information and count as **semi-supervised** — they are not directly comparable to the unsupervised pipelines.
+
+### enhanced_semantic_pca30
+Inner join (on `row_id`) of **`enhanced_pca30`** + **`semantic_pca30`** → numeric/encoded features + 30 text-PCA columns (`pca_*_sem`) + 30 TabPFN-embedding-PCA columns (`pca_*_enh`). Built directly in the `exp2` notebook, no separate preprocessing notebook.
