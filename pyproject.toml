@@ -1,9 +1,13 @@
 [project]
 name = "tfm-master-thesis"
 version = "0.1.0"
-description = "Add your description here"
+description = "Evaluation of Tabular Foundation Models for outlier detection on tabular data with free-text features"
 readme = "README.md"
 requires-python = ">=3.13"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Florian Veitz", email = "florian.veitz@smail.th-koeln.de" }]
+keywords = ["outlier-detection", "anomaly-detection", "tabular-foundation-models", "tabpfn", "contexttab"]
 dependencies = [
     "sap-rpt-oss",
     "pandas",
