@@ -9,7 +9,7 @@ Evaluation of **Tabular Foundation Models (TFMs)** for outlier detection. The TF
 ## Setup
 
 ### Environment
-- **Package manager:** [`uv`](https://docs.astral.sh/uv/) — must be installed. `uv sync` sets up Python 3.13 and all dependencies automatically.
+- **Package manager:** [`uv`](https://docs.astral.sh/uv/) — must be installed. `uv sync` sets up **Python 3.14** (pinned in `.python-version`) and all dependencies from `uv.lock` automatically.
 - **Hardware:** a CUDA-capable GPU for the TFMs (TabPFN, ConTextTab, AnoLLM, FoMo-0D); this work used an **NVIDIA A40-12C** vGPU. The PyOD baselines and the evaluation (`experiment_summary.ipynb`) also run without a GPU.
 - **Internet:** required once to download the model weights from HuggingFace (see [Model weights](#model-weights)).
 
@@ -160,3 +160,14 @@ Grid search; best model chosen on the validation split.
 - **AnoLLM:** batch size = 2 (otherwise CUDA OOM).
 - **TabPFN:** max. 4000 context rows (attention scales quadratically in the number of samples).
 - **Semantic embeddings:** PCA is mandatory — without dimensionality reduction the free-text embeddings produce thousands of features and exceed GPU memory.
+
+---
+
+## License
+
+The code written for this thesis (notebooks, evaluation, documentation) is released under the **MIT License** — see [`LICENSE`](LICENSE).
+
+This does **not** cover:
+- **Vendored third-party code** in `anollm_src/` and `FoMo-0D/` — each ships its own license; see [`VENDORED_SOURCES.md`](VENDORED_SOURCES.md) and the `LICENSE`/`NOTICE` files inside those folders.
+- **Model weights** downloaded at runtime (TabPFN, ConTextTab, the AnoLLM base model, the FoMo-0D checkpoint) — subject to the terms of their respective providers.
+- **The datasets**, which are not redistributed in this repository. Airbnb Paris comes from [Inside Airbnb](https://insideairbnb.com/) and Fake Job Postings from Kaggle; both remain under their original terms of use.
