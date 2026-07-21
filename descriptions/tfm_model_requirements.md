@@ -2,11 +2,11 @@
 
 Input requirements of the Tabular Foundation Models (TFMs) used in this project — what each model structurally expects as input, independent of its concrete use in the notebooks.
 
-Models covered: TabPFN 2.5, TabPFN-Unsupervised, ConTextTab, AnoLLM, FoMo-0D. A compact overview is at the end.
+Models covered: TabPFN, TabPFN-Unsupervised, ConTextTab, AnoLLM, FoMo-0D. A compact overview is at the end.
 
 ---
 
-## 1. TabPFN 2.5 (classifier → embedding extractor)
+## 1. TabPFN (classifier → embedding extractor)
 
 Used not as an OD model but as an **embedding-refinement step** (`get_embeddings`) — the pretrained model is fit on inlier context and returns a representation vector per row, passed downstream to classical detectors (kNN, AE, iForest, …).
 
@@ -113,7 +113,7 @@ Used for **zero-shot OD** — a pretrained PFN model applied to new datasets wit
 
 | Model | Numeric | Text | Categorical | NaN | Max features | Max samples | Label |
 |---|---|---|---|---|---|---|---|
-| **TabPFN 2.5 (embed)** | ✅ native | ❌ | ⚠️ as int | ⚠️ | ~500 (practical) | ~10,000 | ✅ (dummy ok) |
+| **TabPFN (embed)** | ✅ native | ❌ | ⚠️ as int | ⚠️ | ~500 (practical) | ~10,000 | ✅ (dummy ok) |
 | **TabPFN-Unsupervised** | ✅ native | ❌ | ⚠️ as int | ⚠️ | **~50 (practical)** | **~3,000 (practical)** | ❌ |
 | **ConTextTab** | ✅ native | ✅ native | ✅ native | ✅ native | **≤ 500 (hard)** | ≤ 8,192/call | ⚠️ dummy |
 | **AnoLLM** | ⚠️ as token | ✅ native | ✅ as token | ✅ as token | ⚠️ token budget | unlimited | ❌ (inlier-only) |
@@ -128,7 +128,7 @@ Used for **zero-shot OD** — a pretrained PFN model applied to new datasets wit
 | Data situation | Suitable TFMs |
 |---|---|
 | Few features (≤ 50), no text | TabPFN-Unsupervised, FoMo-0D (padded to 100) |
-| Many features (>> 100), no text | TabPFN 2.5 (embed path after PCA), FoMo-0D after PCA(100) |
+| Many features (>> 100), no text | TabPFN (embed path after PCA), FoMo-0D after PCA(100) |
 | Text is central | AnoLLM (semi-supervised), ConTextTab (for SHAP / classification) |
 | Heterogeneous mix (num + text + cat + NaN) | ConTextTab (native), AnoLLM (via serialization) |
 | Pure zero-shot, no training | FoMo-0D, TabPFN-Unsupervised |
