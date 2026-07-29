@@ -1,18 +1,18 @@
 \begin{table}
 \centering
-\caption{Experiment 1 -- Unsupervised Outlier Detection (airbnb paris): AUPRC, AUROC und Laufzeit je Modell (Mittelwert $\pm$ Standardabweichung).}
+\caption{Experiment 1 -- unsupervised outlier detection on Airbnb Paris: AUPRC, AUROC and runtime per model, averaged over three seeds.}
 \label{tab:exp1_airbnb_paris}
-\begin{tabular}{llll}
+\begin{tabular}{lrrrrr}
 \toprule
- & \bfseries AUPRC & \bfseries AUROC & \bfseries runtime\_s \\
+ & \bfseries AUPRC & \bfseries SD (AUPRC) & \bfseries AUROC & \bfseries SD (AUROC) & \bfseries Runtime (s) \\
 \midrule
-ecod & 0.0920 $\pm$ 0.0000 & 0.7213 $\pm$ 0.0000 & 0.6743 $\pm$ 0.0462 \\
-iforest & 0.0832 $\pm$ 0.0000 & 0.7060 $\pm$ 0.0000 & 2.3030 $\pm$ 0.0634 \\
-loda & 0.0607 $\pm$ 0.0081 & 0.5507 $\pm$ 0.0502 & 0.5940 $\pm$ 0.0684 \\
-tabpfn\_unsup & 0.0597 $\pm$ 0.0030 & 0.6434 $\pm$ 0.0044 & 1443.7897 $\pm$ 21.1196 \\
-autoencoder & 0.0578 $\pm$ 0.0000 & 0.6029 $\pm$ 0.0000 & 188.9135 $\pm$ 4.5965 \\
-anollm & 0.0485 $\pm$ 0.0003 & 0.5960 $\pm$ 0.0022 & 9606.8165 $\pm$ 838.9814 \\
-fomo\_od & 0.0414 $\pm$ 0.0000 & 0.5182 $\pm$ 0.0000 & 0.4001 $\pm$ 0.0848 \\
+ecod & 0.1002 & 0.0108 & 0.7413 & 0.0137 & 0.8 \\
+iforest & 0.0941 & 0.0193 & 0.7214 & 0.0129 & 2.4 \\
+loda & 0.0836 & 0.0207 & 0.6545 & 0.0214 & 0.6 \\
+tabpfn\_unsup & 0.0753 & 0.0031 & 0.6843 & 0.0074 & 954.1 \\
+anollm & 0.0719 & 0.0094 & 0.6593 & 0.0121 & 5923.7 \\
+autoencoder & 0.0684 & 0.0089 & 0.6452 & 0.0170 & 155.0 \\
+fomo\_od & 0.0467 & 0.0009 & 0.5873 & 0.0051 & 0.2 \\
 \bottomrule
 \end{tabular}
 \end{table}

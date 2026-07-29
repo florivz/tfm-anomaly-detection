@@ -1,0 +1,31 @@
+\begin{table}
+\centering
+\caption{Preliminary experiment -- semantic relevance on Airbnb Paris: top-20 SHAP features, averaged over three seeds.}
+\label{tab:preliminary_airbnb_paris}
+\begin{tabular}{lrrl}
+\toprule
+ & \bfseries mean abs. SHAP & \bfseries SD & \bfseries Type \\
+\midrule
+calculated\_host\_listings\_count\_entire\_homes & 0.0281 & 0.0370 & numeric \\
+calculated\_host\_listings\_count & 0.0281 & 0.0302 & numeric \\
+name & 0.0259 & 0.0131 & text \\
+description & 0.0245 & 0.0284 & text \\
+amenities\_count & 0.0193 & 0.0165 & numeric \\
+estimated\_occupancy\_l365d & 0.0170 & 0.0121 & numeric \\
+host\_tenure\_days & 0.0143 & 0.0050 & numeric \\
+instant\_bookable & 0.0123 & 0.0075 & numeric \\
+availability\_365 & 0.0119 & 0.0051 & numeric \\
+availability\_eoy & 0.0114 & 0.0071 & numeric \\
+host\_is\_superhost & 0.0102 & 0.0056 & numeric \\
+property\_type\_freq & 0.0102 & 0.0064 & numeric \\
+availability\_60 & 0.0093 & 0.0026 & numeric \\
+availability\_90 & 0.0092 & 0.0026 & numeric \\
+availability\_30 & 0.0091 & 0.0067 & numeric \\
+host\_acceptance\_rate & 0.0085 & 0.0012 & numeric \\
+minimum\_nights & 0.0072 & 0.0083 & numeric \\
+host\_location\_missing & 0.0071 & 0.0058 & numeric \\
+accommodates & 0.0063 & 0.0057 & numeric \\
+host\_response\_time\_unknown & 0.0060 & 0.0014 & numeric \\
+\bottomrule
+\end{tabular}
+\end{table}
