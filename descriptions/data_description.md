@@ -41,11 +41,11 @@ Several columns have a high share of missing values (up to 84 % for `salary_rang
 The cleaned pipeline (`fake_job_notebooks/preprocessing/cleaned.ipynb`):
 
 1. **Split `location`** → `country`, `state`, `city`.
-2. **Parse `salary_range`** → `salary_avg` (range mean, median-imputed).
+2. **Parse `salary_range`** → `salary_avg` (range mean, median-imputed) and `salary_missing` (flag, set before imputation).
 3. Keep **`job_id`** as `row_id` (join key); extract the label `fraudulent`.
-4. Frequency-encode all categories; StandardScaler on numeric columns.
+4. Draw the 50/20/30 split, then frequency-encode all categories and apply `StandardScaler` — **both fitted on training rows only**. Categories unseen in train get frequency 0.
 
-`cleaned` yields **13 numeric features** + `row_id` + label. The variants built on top of it are described in [section 3](#3-preprocessing-variants).
+`cleaned` yields **14 numeric features** + `row_id` + label. The variants built on top of it are described in [section 3](#3-preprocessing-variants).
 
 ---
 
@@ -65,7 +65,7 @@ Source: **Inside Airbnb** (`listings.csv`, scrape **September 2025**). Property,
 | Outliers (`is_top_rating = 0`) | 721 |
 | Outlier rate | **3.93 %** |
 | Raw file | `data/raw/airbnb_paris.csv` |
-| Cleaned file | `data/preprocessed/cleaned_airbnb_paris.csv` |
+| Cleaned file | `data/preprocessed/cleaned_airbnb_paris_seed<k>.csv` |
 
 ### Fully empty columns (Sep-2025 scrape)
 
@@ -75,7 +75,7 @@ These columns are 100 % empty and drive part of the feature engineering:
 |---|---|
 | `price` | no price feature possible (the "parse price" step is dropped) |
 | `beds` | drop; optionally replace with `accommodates` |
-| `bathrooms` | parse from `bathrooms_text` (`"1 bath"`, `"1.5 baths"`, `"shared bath"`) |
+| `bathrooms` | dropped — the column is empty and `bathrooms_text` is not parsed |
 | `neighbourhood_group_cleansed`, `calendar_updated`, `estimated_revenue_l365d` | drop |
 
 ### Columns (selection)
@@ -83,7 +83,7 @@ These columns are 100 % empty and drive part of the feature engineering:
 | Type | Columns |
 |---|---|
 | ID / metadata | `id`, `host_id`, `listing_url`, `scrape_id`, `last_scraped` *(removed in cleaning)* |
-| Property | `property_type` (61 values, freq-enc), `room_type` (4 values, OHE), `accommodates`, `bedrooms`; `bathrooms` from `bathrooms_text` |
+| Property | `property_type` (freq-enc), `room_type` (4 values, OHE), `accommodates`, `bedrooms` |
 | Host | `host_since`, `host_response_rate`, `host_acceptance_rate`, `host_is_superhost`, `host_identity_verified`, `host_verifications`, `host_location` |
 | Geo | `latitude`, `longitude`, `neighbourhood_cleansed` (arrondissements, freq-encoded) |
 | Booking | `minimum_nights`, `maximum_nights`, `instant_bookable`, `availability_30/60/90/365` |
@@ -107,16 +107,19 @@ In `airbnb_notebooks/preprocessing/cleaned.ipynb`:
 
 `airbnb_notebooks/preprocessing/cleaned.ipynb`:
 
-1. **`host_since`** → `host_tenure_days` (days since registration).
+1. **`host_since`** → `host_tenure_days`, measured against a **fixed scrape reference date** (`2025-09-01`). A global maximum would be a fit over all rows; a train maximum would make a row-wise feature seed-dependent.
 2. **`host_response_rate`, `host_acceptance_rate`** → strip `%`, cast to float.
-3. **`bathrooms`** → parse from `bathrooms_text` (`"shared/half bath"` → 0.5).
-4. **`amenities`, `host_verifications`** → list lengths as counts.
-5. **`host_location`** → flags `host_in_paris`, `host_in_france`, `host_location_missing`; raw column dropped.
-6. **Boolean (`t`/`f`)** → 0/1.
-7. **OHE** for low cardinality: `host_response_time` (5 columns incl. `unknown`), `room_type` (4 columns).
-8. **Frequency encoding** for high cardinality: `neighbourhood_cleansed` (20 arrondissements), `property_type` (61 values).
-9. **StandardScaler** on all numeric / frequency-encoded columns (boolean, OHE, label, free texts excluded).
-10. Column names normalized to `snake_case` (ASCII, lowercase).
+3. **`amenities`, `host_verifications`** → list lengths as counts.
+4. **`host_location`** → flags `host_in_paris`, `host_in_france`, `host_location_missing`; raw column dropped.
+5. **Boolean (`t`/`f`)** → 0/1.
+6. Draw the 50/20/30 split. Everything below is **fitted on training rows only**.
+7. **Imputation**: numeric → median, boolean → mode, categorical → `"unknown"`; then drop columns that are constant *in train* (this removes the fully empty `beds` and `bathrooms`).
+8. **OHE** for low cardinality: `host_response_time` (5 columns incl. `unknown`), `room_type` (4 columns). The level set is determined over all rows — see the limitation note in the README.
+9. **Frequency encoding** for high cardinality: `neighbourhood_cleansed` (20 arrondissements), `property_type`; categories unseen in train get frequency 0.
+10. **StandardScaler** on all numeric / frequency-encoded columns (boolean, OHE, label, free texts excluded).
+11. Column names normalized to `snake_case` (ASCII, lowercase).
+
+> **`number_of_reviews_ly` is dropped.** All other `number_of_reviews*` columns were already removed as leakage; this one had been overlooked. On a dataset whose label is derived from review scores, review activity is a label proxy — and its presence made the comparison against AnoLLM (which always dropped it) unfair.
 
 The variants built on top of `cleaned` are described in the next section.
 
@@ -124,33 +127,37 @@ The variants built on top of `cleaned` are described in the next section.
 
 ## 3. Preprocessing variants
 
-Nine variants are stored as CSV under `data/preprocessed/<variant>_<dataset>.csv`; the notebooks live in `<dataset>_notebooks/preprocessing/`. The tenth (`enhanced_semantic_pca30`) is assembled on the fly in the `exp2` notebook. The label logic is identical across all variants, and every file keeps `row_id` as the join key.
+Artefacts live under `data/preprocessed/`; the notebooks live in `<dataset>_notebooks/preprocessing/`. The label logic is identical across all variants, and every file keeps `row_id` as the join key.
 
-| Variant | Notebook | Content |
-|---|---|---|
-| `cleaned` | `cleaned.ipynb` | numeric/encoded features only (free text removed) |
-| `cleaned_text` | `cleaned_text.ipynb` | `cleaned` + the original free-text columns |
-| `semantic` | `semantic.ipynb` | `cleaned` + Sentence-Transformer text embeddings (high-dimensional) |
-| `semantic_pca100` / `semantic_pca30` | `semantic_pca*.ipynb` | `semantic` with the text block reduced to 100 / 30 PCA components |
-| `fast_text_pca100` / `fast_text_pca30` | `fast_text.ipynb` | `cleaned` + fastText text embeddings, PCA 100 / 30 |
-| `enhanced` | `enhanced.ipynb` | TabPFN embeddings only (~192-dim), no raw features |
-| `enhanced_pca30` | `enhanced_pca30.ipynb` | `enhanced` reduced to 30 PCA components |
-| `enhanced_semantic_pca30` | — (built in `exp2`) | join of `enhanced_pca30` + `semantic_pca30` |
+**Seed-dependence.** Anything that involves fitting — imputation, encoding, scaling, PCA, the fastText model, the TabPFN embeddings — is fitted on the training rows of a specific split and therefore carries a `_seed<k>` suffix. Only artefacts that involve no fitting at all are shared across seeds.
+
+| Artefact | Notebook | Seed | Content |
+|---|---|---|---|
+| `rows_<ds>.csv` (in `data/splits/`) | `cleaned.ipynb` | shared | `row_id` + label — the row universe (Airbnb after the ICC filter) |
+| `split_<ds>_seed<k>.csv` (in `data/splits/`) | `cleaned.ipynb` | per seed | `row_id` → `train` / `val` / `test` |
+| `cleaned_<ds>_seed<k>.csv` | `cleaned.ipynb` | per seed | numeric/encoded features only (free text removed) |
+| `cleaned_text_<ds>.csv` | `cleaned_text.ipynb` | shared | `row_id` + label + the original free-text columns |
+| `semantic_emb_<ds>.parquet` | `semantic.ipynb` | shared | `row_id` + Sentence-Transformer embedding block (float32) |
+| `semantic_pca{30,100}_<ds>_seed<k>.csv` | `semantic_pca.ipynb` | per seed | `cleaned` + the embedding block reduced to 30 / 100 PCA components |
+| `fast_text_pca{30,100}_<ds>_seed<k>.csv` | `fast_text.ipynb` | per seed | `cleaned` + fastText embeddings, PCA 30 / 100 |
+| `enhanced_<ds>_seed<k>.csv` | `enhanced.ipynb` | per seed | TabPFN embeddings only (~192-dim), no raw features |
+| `enhanced_pca30_<ds>_seed<k>.csv` | `enhanced_pca30.ipynb` | per seed | `enhanced` reduced to 30 PCA components |
+| `enhanced_semantic_pca30` | — (built in `exp2`) | per seed | join of `enhanced_pca30` + `semantic_pca30` |
 
 ### cleaned
-Purely numeric table: free-text and leakage columns removed, categoricals frequency-/one-hot-encoded, numeric median-imputed and **StandardScaler**-normalized. Since the two datasets differ in content, `cleaned` is implemented **per dataset** — see the feature-engineering sections above ([Fake Jobs](#feature-engineering), [Airbnb Paris](#feature-engineering-1)).
+Purely numeric table: free-text and leakage columns removed, categoricals frequency-/one-hot-encoded, numeric median-imputed and **StandardScaler**-normalized — all fitted on training rows only. Since the two datasets differ in content, `cleaned` is implemented **per dataset** — see the feature-engineering sections above ([Fake Jobs](#feature-engineering), [Airbnb Paris](#feature-engineering-1)).
 
 ### cleaned_text
-`cleaned` **+** the original free-text columns (joined via `row_id`) — 5 texts for Fake Jobs, 4 for Airbnb. Input format for the models that process text natively (AnoLLM, ConTextTab).
+`row_id` + label + the original free-text columns — 5 texts for Fake Jobs, 4 for Airbnb. Nothing is fitted here, so the file is shared across seeds; the models that process text natively (AnoLLM, ConTextTab) join it against the seed-specific `cleaned`.
 
-### semantic / semantic_pca100 / semantic_pca30
-Each **free-text cell** is embedded with a Sentence-Transformer (`all-mpnet-base-v2`), with the column-name embedding added on top; the free-text columns are replaced by their embedding vectors. `semantic` keeps the full block (1,500+ dimensions), the `_pca*` variants reduce it to **100** or **30** components — PCA 30 still retains > 80 % explained variance.
+### semantic_emb / semantic_pca30 / semantic_pca100
+Each **free-text cell** is embedded with a Sentence-Transformer (`all-mpnet-base-v2`), with the column-name embedding added on top, followed by a per-row LayerNorm. The encoder is pretrained and frozen and the normalisation is row-wise, so no statistic crosses rows — the embedding block is computed **once** and stored as float32 Parquet (the CSV equivalent would be ~700 MB per dataset). `semantic_pca.ipynb` then fits the PCA **on the training rows** and writes the 30- and 100-component variants; the explained variance is printed per run.
 
-### fast_text_pca100 / fast_text_pca30
-Same pipeline as `semantic`, but the cells are embedded with unsupervised **fastText** (skipgram, 100d per column, column-name embedding added, per-vector LayerNorm) and then PCA-reduced to **30** or **100** components. Serves as the non-Transformer alternative for the free-text representation.
+### fast_text_pca30 / fast_text_pca100
+Same idea, but the cells are embedded with unsupervised **fastText** (skipgram, 100d per column, column-name embedding added, per-vector LayerNorm). The fastText model is trained on the **training rows' texts only**, with `thread=1` so the Hogwild parallelism does not introduce nondeterminism. Serves as the non-Transformer alternative for the free-text representation.
 
 ### enhanced / enhanced_pca30
-`cleaned` (text removed) → **TabPFN** is fit on the label, and `get_embeddings` yields a ~192-dim representation per row, which *replaces* the raw features. `enhanced_pca30` reduces this to 30 components (> 80 % explained variance).
+`cleaned` (text removed) → **TabPFN** is fit on the label of the **training rows** (capped at 9000 context rows), and `get_embeddings` yields a ~192-dim representation per row, which *replaces* the raw features. `enhanced_pca30` reduces this to 30 components.
 
 > **Leakage:** the TabPFN embeddings are trained on the label, so these two variants carry label information and count as **semi-supervised** — they are not directly comparable to the unsupervised pipelines.
 
