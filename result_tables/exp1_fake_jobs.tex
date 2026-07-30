@@ -1,18 +1,18 @@
 \begin{table}
 \centering
-\caption{Experiment 1 -- Unsupervised Outlier Detection (fake jobs): AUPRC, AUROC und Laufzeit je Modell (Mittelwert $\pm$ Standardabweichung).}
+\caption{Experiment 1 -- unsupervised outlier detection on Fake Job Postings: AUPRC, AUROC and runtime per model, averaged over three seeds.}
 \label{tab:exp1_fake_jobs}
-\begin{tabular}{llll}
+\begin{tabular}{lrrrrr}
 \toprule
- & \bfseries AUPRC & \bfseries AUROC & \bfseries runtime\_s \\
+ & \bfseries AUPRC & \bfseries SD (AUPRC) & \bfseries AUROC & \bfseries SD (AUROC) & \bfseries Runtime (s) \\
 \midrule
-anollm & 0.1005 $\pm$ 0.0013 & 0.6306 $\pm$ 0.0016 & 8113.3125 $\pm$ 1193.0984 \\
-iforest & 0.0890 $\pm$ 0.0000 & 0.6125 $\pm$ 0.0000 & 2.4863 $\pm$ 0.0789 \\
-autoencoder & 0.0816 $\pm$ 0.0000 & 0.6003 $\pm$ 0.0000 & 180.9683 $\pm$ 9.7396 \\
-ecod & 0.0745 $\pm$ 0.0000 & 0.6125 $\pm$ 0.0000 & 0.4611 $\pm$ 0.0211 \\
-fomo\_od & 0.0624 $\pm$ 0.0000 & 0.6040 $\pm$ 0.0000 & 0.4328 $\pm$ 0.0373 \\
-tabpfn\_unsup & 0.0619 $\pm$ 0.0013 & 0.5252 $\pm$ 0.0067 & 356.9191 $\pm$ 6.1042 \\
-loda & 0.0526 $\pm$ 0.0085 & 0.5185 $\pm$ 0.0327 & 0.4901 $\pm$ 0.0041 \\
+anollm & 0.0916 & 0.0085 & 0.6261 & 0.0110 & 5400.6 \\
+iforest & 0.0844 & 0.0103 & 0.6188 & 0.0145 & 2.3 \\
+ecod & 0.0761 & 0.0039 & 0.6264 & 0.0090 & 0.6 \\
+autoencoder & 0.0737 & 0.0018 & 0.6152 & 0.0108 & 143.3 \\
+fomo\_od & 0.0673 & 0.0061 & 0.6351 & 0.0194 & 0.2 \\
+tabpfn\_unsup & 0.0625 & 0.0028 & 0.5242 & 0.0343 & 275.4 \\
+loda & 0.0548 & 0.0157 & 0.5040 & 0.0693 & 0.5 \\
 \bottomrule
 \end{tabular}
 \end{table}

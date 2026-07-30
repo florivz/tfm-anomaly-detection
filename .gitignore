@@ -30,7 +30,10 @@ htmlcov/
 
 # Data & model artifacts
 data/preprocessed/*.csv
+data/preprocessed/*.parquet
+data/splits/*.csv
 data/raw/*.csv
+run_logs/
 *.zip
 *.ckpt
 *.pt

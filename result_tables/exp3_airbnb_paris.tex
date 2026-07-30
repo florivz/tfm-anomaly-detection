@@ -1,31 +1,15 @@
 \begin{table}
 \centering
-\caption{Experiment 3 -- Semantische Relevanz (airbnb paris): Top-20 SHAP-Features (Text und numerisch).}
+\caption{Experiment 3 -- TFM classification on Airbnb Paris: AUPRC, AUROC and runtime per model and context variant, averaged over three seeds.}
 \label{tab:exp3_airbnb_paris}
-\begin{tabular}{lrl}
+\begin{tabular}{lrrrrr}
 \toprule
- & \bfseries mean\_abs\_shap & \bfseries type \\
+ & \bfseries AUPRC & \bfseries SD (AUPRC) & \bfseries AUROC & \bfseries SD (AUROC) & \bfseries Runtime (s) \\
 \midrule
-host\_tenure\_days & 0.0352 & numeric \\
-name & 0.0352 & text \\
-estimated\_occupancy\_l365d & 0.0276 & numeric \\
-calculated\_host\_listings\_count & 0.0265 & numeric \\
-host\_is\_superhost & 0.0216 & numeric \\
-calculated\_host\_listings\_count\_entire\_homes & 0.0180 & numeric \\
-description & 0.0170 & text \\
-minimum\_nights & 0.0163 & numeric \\
-instant\_bookable & 0.0162 & numeric \\
-accommodates & 0.0147 & numeric \\
-host\_response\_time\_within\_an\_hour & 0.0102 & numeric \\
-longitude & 0.0082 & numeric \\
-host\_about & 0.0082 & text \\
-availability\_365 & 0.0079 & numeric \\
-number\_of\_reviews\_ly & 0.0072 & numeric \\
-amenities\_count & 0.0067 & numeric \\
-host\_identity\_verified & 0.0061 & numeric \\
-maximum\_nights & 0.0058 & numeric \\
-availability\_60 & 0.0050 & numeric \\
-availability\_30 & 0.0047 & numeric \\
+contexttab\_balanced\_1to4 & 0.2312 & 0.0215 & 0.8885 & 0.0068 & 22.4 \\
+tabpfn\_classification\_balanced\_1to4 & 0.2274 & 0.0201 & 0.8894 & 0.0110 & 5.2 \\
+tabpfn\_classification\_natural & 0.1848 & 0.0147 & 0.8605 & 0.0051 & 5.2 \\
+contexttab\_natural & 0.1831 & 0.0147 & 0.8535 & 0.0055 & 22.5 \\
 \bottomrule
 \end{tabular}
 \end{table}
