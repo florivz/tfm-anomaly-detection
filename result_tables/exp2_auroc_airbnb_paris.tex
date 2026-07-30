@@ -1,15 +1,16 @@
 \begin{table}
 \centering
-\caption{Experiment 2 -- Enhanced Baselines (airbnb paris): AUROC je Detektor und Repräsentation (Mittelwert $\pm$ Standardabweichung).}
+\caption{Experiment 2 -- enhanced baselines on Airbnb Paris: AUROC per detector and representation, averaged over three seeds.}
 \label{tab:exp2_auroc_airbnb_paris}
-\begin{tabular}{lllllllll}
+\begin{tabular}{lrrrrrrrrrrrrrr}
 \toprule
- & \bfseries cleaned & \bfseries semantic\_pca30 & \bfseries semantic\_pca100 & \bfseries fast\_text\_pca30 & \bfseries fast\_text\_pca100 & \bfseries enhanced & \bfseries enhanced\_pca30 & \bfseries enhanced\_semantic\_pca30 \\
+ & \multicolumn{2}{r}{\bfseries semantic\_pca30} & \multicolumn{2}{r}{\bfseries semantic\_pca100} & \multicolumn{2}{r}{\bfseries fast\_text\_pca30} & \multicolumn{2}{r}{\bfseries fast\_text\_pca100} & \multicolumn{2}{r}{\bfseries enhanced} & \multicolumn{2}{r}{\bfseries enhanced\_pca30} & \multicolumn{2}{r}{\bfseries enhanced\_semantic\_pca30} \\
+ & \bfseries AUROC & \bfseries SD & \bfseries AUROC & \bfseries SD & \bfseries AUROC & \bfseries SD & \bfseries AUROC & \bfseries SD & \bfseries AUROC & \bfseries SD & \bfseries AUROC & \bfseries SD & \bfseries AUROC & \bfseries SD \\
 \midrule
-autoencoder & 0.6110 $\pm$ 0.0003 & 0.5230 $\pm$ 0.0000 & 0.5005 $\pm$ 0.0004 & 0.5589 $\pm$ 0.0000 & 0.5536 $\pm$ 0.0000 & 0.7742 $\pm$ 0.0000 & 0.7148 $\pm$ 0.0000 & 0.6637 $\pm$ 0.0000 \\
-ecod & 0.7240 $\pm$ 0.0000 & 0.6733 $\pm$ 0.0000 & 0.6141 $\pm$ 0.0000 & 0.7002 $\pm$ 0.0000 & 0.6365 $\pm$ 0.0000 & 0.6290 $\pm$ 0.0000 & 0.7455 $\pm$ 0.0000 & 0.7620 $\pm$ 0.0000 \\
-iforest & 0.6962 $\pm$ 0.0000 & 0.6622 $\pm$ 0.0009 & 0.6116 $\pm$ 0.0000 & 0.6887 $\pm$ 0.0000 & 0.6709 $\pm$ 0.0000 & 0.6681 $\pm$ 0.0000 & 0.7569 $\pm$ 0.0000 & 0.7306 $\pm$ 0.0000 \\
-loda & 0.6619 $\pm$ 0.0309 & 0.5937 $\pm$ 0.0000 & 0.5150 $\pm$ 0.0000 & 0.5619 $\pm$ 0.0000 & 0.5589 $\pm$ 0.0000 & 0.6854 $\pm$ 0.0000 & 0.7299 $\pm$ 0.0000 & 0.5384 $\pm$ 0.0000 \\
+autoencoder & 0.5672 & 0.0092 & 0.5463 & 0.0073 & 0.5687 & 0.0127 & 0.5581 & 0.0015 & 0.7107 & 0.0196 & 0.6859 & 0.0205 & 0.6501 & 0.0168 \\
+ecod & 0.6904 & 0.0040 & 0.6063 & 0.0020 & 0.6892 & 0.0042 & 0.6136 & 0.0057 & 0.5232 & 0.0277 & 0.7159 & 0.0139 & 0.7327 & 0.0061 \\
+iforest & 0.6920 & 0.0074 & 0.6693 & 0.0062 & 0.6898 & 0.0171 & 0.6621 & 0.0104 & 0.5668 & 0.0090 & 0.7042 & 0.0068 & 0.7248 & 0.0066 \\
+loda & 0.5739 & 0.0320 & 0.5592 & 0.0082 & 0.6566 & 0.0499 & 0.6460 & 0.0235 & 0.5399 & 0.0076 & 0.6341 & 0.0783 & 0.5582 & 0.0150 \\
 \bottomrule
 \end{tabular}
 \end{table}

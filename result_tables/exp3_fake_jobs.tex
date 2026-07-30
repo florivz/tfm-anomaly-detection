@@ -1,29 +1,15 @@
 \begin{table}
 \centering
-\caption{Experiment 3 -- Semantische Relevanz (fake jobs): Top-20 SHAP-Features (Text und numerisch).}
+\caption{Experiment 3 -- TFM classification on Fake Job Postings: AUPRC, AUROC and runtime per model and context variant, averaged over three seeds.}
 \label{tab:exp3_fake_jobs}
-\begin{tabular}{lrl}
+\begin{tabular}{lrrrrr}
 \toprule
- & \bfseries mean\_abs\_shap & \bfseries type \\
+ & \bfseries AUPRC & \bfseries SD (AUPRC) & \bfseries AUROC & \bfseries SD (AUROC) & \bfseries Runtime (s) \\
 \midrule
-company\_profile & 0.1373 & text \\
-has\_company\_logo & 0.0547 & numeric \\
-title & 0.0503 & text \\
-description & 0.0354 & text \\
-has\_questions & 0.0310 & numeric \\
-requirements & 0.0286 & text \\
-salary\_avg & 0.0265 & numeric \\
-country & 0.0150 & numeric \\
-benefits & 0.0136 & text \\
-industry & 0.0116 & numeric \\
-required\_experience & 0.0097 & numeric \\
-required\_education & 0.0094 & numeric \\
-employment\_type & 0.0085 & numeric \\
-city & 0.0074 & numeric \\
-state & 0.0056 & numeric \\
-function & 0.0030 & numeric \\
-department & 0.0009 & numeric \\
-telecommuting & 0.0005 & numeric \\
+contexttab\_balanced\_1to4 & 0.9106 & 0.0121 & 0.9881 & 0.0025 & 21.9 \\
+contexttab\_natural & 0.7813 & 0.0431 & 0.9699 & 0.0076 & 22.4 \\
+tabpfn\_classification\_balanced\_1to4 & 0.6987 & 0.0159 & 0.9459 & 0.0059 & 4.1 \\
+tabpfn\_classification\_natural & 0.5615 & 0.0124 & 0.9185 & 0.0050 & 4.3 \\
 \bottomrule
 \end{tabular}
 \end{table}

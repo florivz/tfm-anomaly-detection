@@ -1,15 +1,16 @@
 \begin{table}
 \centering
-\caption{Experiment 2 -- Enhanced Baselines (fake jobs): AUPRC je Detektor und Repräsentation (Mittelwert $\pm$ Standardabweichung).}
+\caption{Experiment 2 -- enhanced baselines on Fake Job Postings: AUPRC per detector and representation, averaged over three seeds.}
 \label{tab:exp2_fake_jobs}
-\begin{tabular}{lllllllll}
+\begin{tabular}{lrrrrrrrrrrrrrr}
 \toprule
- & \bfseries cleaned & \bfseries semantic\_pca30 & \bfseries semantic\_pca100 & \bfseries fast\_text\_pca30 & \bfseries fast\_text\_pca100 & \bfseries enhanced & \bfseries enhanced\_pca30 & \bfseries enhanced\_semantic\_pca30 \\
+ & \multicolumn{2}{r}{\bfseries semantic\_pca30} & \multicolumn{2}{r}{\bfseries semantic\_pca100} & \multicolumn{2}{r}{\bfseries fast\_text\_pca30} & \multicolumn{2}{r}{\bfseries fast\_text\_pca100} & \multicolumn{2}{r}{\bfseries enhanced} & \multicolumn{2}{r}{\bfseries enhanced\_pca30} & \multicolumn{2}{r}{\bfseries enhanced\_semantic\_pca30} \\
+ & \bfseries AUPRC & \bfseries SD & \bfseries AUPRC & \bfseries SD & \bfseries AUPRC & \bfseries SD & \bfseries AUPRC & \bfseries SD & \bfseries AUPRC & \bfseries SD & \bfseries AUPRC & \bfseries SD & \bfseries AUPRC & \bfseries SD \\
 \midrule
-autoencoder & 0.0816 $\pm$ 0.0000 & 0.0696 $\pm$ 0.0000 & 0.0573 $\pm$ 0.0000 & 0.0742 $\pm$ 0.0000 & 0.0760 $\pm$ 0.0000 & 0.1793 $\pm$ 0.0000 & 0.0849 $\pm$ 0.0000 & 0.0919 $\pm$ 0.0000 \\
-ecod & 0.0745 $\pm$ 0.0000 & 0.0580 $\pm$ 0.0000 & 0.0457 $\pm$ 0.0000 & 0.0812 $\pm$ 0.0000 & 0.0768 $\pm$ 0.0000 & 0.1142 $\pm$ 0.0000 & 0.1074 $\pm$ 0.0000 & 0.0814 $\pm$ 0.0000 \\
-iforest & 0.0858 $\pm$ 0.0000 & 0.0842 $\pm$ 0.0000 & 0.0564 $\pm$ 0.0005 & 0.0902 $\pm$ 0.0000 & 0.0780 $\pm$ 0.0000 & 0.1130 $\pm$ 0.0000 & 0.1453 $\pm$ 0.0000 & 0.1101 $\pm$ 0.0019 \\
-loda & 0.0603 $\pm$ 0.0210 & 0.0384 $\pm$ 0.0000 & 0.0448 $\pm$ 0.0000 & 0.0486 $\pm$ 0.0000 & 0.0531 $\pm$ 0.0000 & 0.1503 $\pm$ 0.0000 & 0.1208 $\pm$ 0.0000 & 0.0445 $\pm$ 0.0000 \\
+autoencoder & 0.0668 & 0.0083 & 0.0483 & 0.0032 & 0.0775 & 0.0070 & 0.0734 & 0.0091 & 0.1196 & 0.0113 & 0.0829 & 0.0057 & 0.0817 & 0.0094 \\
+ecod & 0.0540 & 0.0009 & 0.0432 & 0.0003 & 0.0849 & 0.0068 & 0.0678 & 0.0087 & 0.1199 & 0.0136 & 0.1104 & 0.0419 & 0.0735 & 0.0075 \\
+iforest & 0.0890 & 0.0051 & 0.0524 & 0.0056 & 0.1148 & 0.0128 & 0.0807 & 0.0149 & 0.1192 & 0.0192 & 0.1321 & 0.0091 & 0.1176 & 0.0181 \\
+loda & 0.0515 & 0.0051 & 0.0450 & 0.0050 & 0.0652 & 0.0111 & 0.0675 & 0.0116 & 0.1029 & 0.0164 & 0.1132 & 0.0328 & 0.0748 & 0.0234 \\
 \bottomrule
 \end{tabular}
 \end{table}
