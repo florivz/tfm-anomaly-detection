@@ -3,7 +3,7 @@ name = "tfm-master-thesis"
 version = "0.1.0"
 description = "Evaluation of Tabular Foundation Models for outlier detection on tabular data with free-text features"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Florian Veitz", email = "florian.veitz@smail.th-koeln.de" }]
@@ -30,3 +30,8 @@ dependencies = [
 
 [tool.uv.sources]
 sap-rpt-oss = { git = "https://github.com/SAP-samples/sap-rpt-1-oss.git" }
+
+[dependency-groups]
+dev = [
+    "nbstripout>=0.9.1",
+]
