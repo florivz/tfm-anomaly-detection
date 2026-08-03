@@ -49,7 +49,6 @@ Preprocessed data is **not** distributed: it is seed-dependent by construction a
 - **`diagrams/`**, **`result_tables/`** — generated plots and exported tables
 - **`mlruns/`** — local MLflow directory (run logs)
 - **`experiment_summary.ipynb`** — central evaluation notebook
-- **`aenderungen.md`** — the methodological rework and the limitations that remain
 
 ---
 
