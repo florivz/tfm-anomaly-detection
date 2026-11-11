@@ -1,12 +1,12 @@
 [project]
 name = "tfm-master-thesis"
 version = "0.1.0"
-description = "Evaluation of Tabular Foundation Models for outlier detection on tabular data with free-text features"
+description = "Code for 'Evaluating Foundation Model Embeddings for Anomaly Detection in Multivariate Tabular Data': tabular foundation models for unsupervised outlier detection on tabular data with free-text features"
 readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"
 license-files = ["LICENSE"]
-authors = [{ name = "Florian Veitz", email = "florian.veitz@smail.th-koeln.de" }]
+authors = [{ name = "Florian Veitz", email = "contact@florian-veitz.de" }]
 keywords = ["outlier-detection", "anomaly-detection", "tabular-foundation-models", "tabpfn", "contexttab"]
 dependencies = [
     "sap-rpt-oss",
@@ -27,6 +27,10 @@ dependencies = [
     "safetensors",
     "fasttext-wheel>=0.9.2",
 ]
+
+[project.urls]
+Repository = "https://github.com/florivz/tfm-anomaly-detection"
+"Experiment logs" = "https://doi.org/10.5281/zenodo.24141080"
 
 [tool.uv.sources]
 sap-rpt-oss = { git = "https://github.com/SAP-samples/sap-rpt-1-oss.git" }
