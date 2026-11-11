@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite it as below."
+type: software
+title: 'tfm-anomaly-detection: Code for "Evaluating Foundation Model Embeddings for Anomaly Detection in Multivariate Tabular Data"'
+abstract: >-
+  Code, notebooks and evaluation for an empirical study of tabular foundation
+  models (TabPFN, FoMo-0D, AnoLLM, ConTextTab) and classical detectors for
+  unsupervised anomaly detection on tabular data with free-text columns,
+  including text embeddings (FastText, sentence transformer) and
+  model-internal TabPFN representations.
+authors:
+  - family-names: Veitz
+    given-names: Florian
+    email: contact@florian-veitz.de
+    orcid: "https://orcid.org/0009-0008-8519-4495"
+    affiliation: "TH Köln – University of Applied Sciences"
+repository-code: "https://github.com/florivz/tfm-anomaly-detection"
+license: MIT
+keywords:
+  - anomaly detection
+  - outlier detection
+  - tabular foundation models
+  - tabular data
+  - text embeddings
+  - TabPFN
+references:
+  - type: data
+    title: 'MLflow experiment logs for "Evaluating Foundation Model Embeddings for Anomaly Detection in Multivariate Tabular Data"'
+    authors:
+      - family-names: Veitz
+        given-names: Florian
+        orcid: "https://orcid.org/0009-0008-8519-4495"
+    doi: 10.5281/zenodo.24141080
+    version: "1.0"
+    year: 2026
+    publisher:
+      name: Zenodo
+    license: CC-BY-4.0
